@@ -1,28 +1,17 @@
 import nodemailer from 'nodemailer'
 
-// Primary SMTP (Domain)
-const primaryTransporter = nodemailer.createTransporter({
-  host: process.env.SMTP_HOST || 'mail.lelangmobil.com',
+// Auto-configured SMTP (Gmail with domain FROM)
+const transporter = nodemailer.createTransporter({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.SMTP_PORT || '587'),
   secure: false,
   auth: {
-    user: process.env.SMTP_USER || 'noreply@lelangmobil.com',
-    pass: process.env.SMTP_PASS || 'LelangMobil2025!Secure',
+    user: process.env.SMTP_USER || 'jamila.lelangmobil@gmail.com',
+    pass: process.env.SMTP_PASS || 'lelangmobil2025app',
   },
   tls: {
     rejectUnauthorized: false
   }
-})
-
-// Backup SMTP (Gmail)
-const backupTransporter = nodemailer.createTransporter({
-  host: process.env.SMTP_BACKUP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_BACKUP_PORT || '587'),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_BACKUP_USER,
-    pass: process.env.SMTP_BACKUP_PASS,
-  },
 })
 
 export async function sendEmail({
@@ -36,34 +25,20 @@ export async function sendEmail({
   html?: string
   text?: string
 }) {
-  const emailData = {
-    from: process.env.SMTP_FROM || '"LelangMobil" <noreply@lelangmobil.com>',
-    to,
-    subject,
-    text,
-    html,
-  }
-  
-  // Try primary SMTP first
   try {
-    const info = await primaryTransporter.sendMail(emailData)
-    console.log('Email sent via primary SMTP:', info.messageId)
-    return { success: true, messageId: info.messageId, provider: 'primary' }
-  } catch (primaryError) {
-    console.warn('Primary SMTP failed, trying backup:', primaryError.message)
+    const info = await transporter.sendMail({
+      from: process.env.SMTP_FROM || '"LelangMobil" <noreply@lelangmobil.com>',
+      to,
+      subject,
+      text,
+      html,
+    })
     
-    // Fallback to backup SMTP
-    try {
-      const info = await backupTransporter.sendMail({
-        ...emailData,
-        from: `"LelangMobil" <${process.env.SMTP_BACKUP_USER}>`,
-      })
-      console.log('Email sent via backup SMTP:', info.messageId)
-      return { success: true, messageId: info.messageId, provider: 'backup' }
-    } catch (backupError) {
-      console.error('Both SMTP failed:', { primaryError, backupError })
-      return { success: false, error: backupError.message }
-    }
+    console.log('Email sent successfully:', info.messageId)
+    return { success: true, messageId: info.messageId }
+  } catch (error) {
+    console.error('Email error:', error)
+    return { success: false, error: error.message }
   }
 }
 

@@ -9,15 +9,15 @@ async function main() {
   // Hash password
   const hashedPassword = await bcrypt.hash('password123', 10)
 
-  // Create Admin User
+  // Create Admin User (Jamila Ramadhani)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@lelangmobil.com' },
     update: {},
     create: {
       email: 'admin@lelangmobil.com',
       password: hashedPassword,
-      name: 'Administrator',
-      phone: '081234567890',
+      name: 'Jamila Ramadhani',
+      phone: '0882022783493',
       role: 'ADMIN',
       emailVerified: true, // Admin tidak perlu verifikasi
       kycStatus: 'APPROVED',

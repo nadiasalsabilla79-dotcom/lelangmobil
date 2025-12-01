@@ -10,21 +10,9 @@ export interface BankAccount {
 export const BANK_ACCOUNTS: BankAccount[] = [
   {
     bankName: 'BCA',
-    accountNumber: '1234567890',
-    accountName: 'PT LELANGMOBIL INDONESIA',
+    accountNumber: '8460520283',
+    accountName: 'JAMILA RAMADHANI',
     logo: '/banks/bca-logo.png'
-  },
-  {
-    bankName: 'MANDIRI',
-    accountNumber: '0987654321',
-    accountName: 'PT LELANGMOBIL INDONESIA',
-    logo: '/banks/mandiri-logo.png'
-  },
-  {
-    bankName: 'BRI',
-    accountNumber: '1122334455',
-    accountName: 'PT LELANGMOBIL INDONESIA',
-    logo: '/banks/bri-logo.png'
   }
 ]
 
