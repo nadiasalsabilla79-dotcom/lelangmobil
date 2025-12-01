@@ -1,18 +1,4 @@
-import nodemailer from 'nodemailer'
-
-// Auto-configured SMTP (Gmail with domain FROM)
-const transporter = nodemailer.createTransporter({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER || 'jamila.lelangmobil@gmail.com',
-    pass: process.env.SMTP_PASS || 'lelangmobil2025app',
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-})
+import { sendAutoEmail } from './auto-smtp'
 
 export async function sendEmail({
   to,
@@ -25,21 +11,7 @@ export async function sendEmail({
   html?: string
   text?: string
 }) {
-  try {
-    const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM || '"LelangMobil" <noreply@lelangmobil.com>',
-      to,
-      subject,
-      text,
-      html,
-    })
-    
-    console.log('Email sent successfully:', info.messageId)
-    return { success: true, messageId: info.messageId }
-  } catch (error) {
-    console.error('Email error:', error)
-    return { success: false, error: error.message }
-  }
+  return await sendAutoEmail({ to, subject, html, text })
 }
 
 export async function sendVerificationEmail(email: string, token: string) {
