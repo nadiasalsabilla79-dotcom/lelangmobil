@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
-import { HeroSection } from "@/components/home/hero-section"
-import { StatsSection } from "@/components/home/stats-section"
+import { ModernHeroSection } from "@/components/home/modern-hero-section"
+import { ModernStatsSection } from "@/components/home/modern-stats-section"
 import { LiveAuctionSection } from "@/components/home/live-auction-section"
 import { UpcomingAuctionSection } from "@/components/home/upcoming-auction-section"
 import { HowItWorksSection } from "@/components/home/how-it-works-section"
@@ -74,8 +74,8 @@ export default function HomePage() {
       />
 
       <main className="min-h-screen">
-        <HeroSection />
-        <StatsSection />
+        <ModernHeroSection />
+        <ModernStatsSection />
         <LiveAuctionSection />
         <UpcomingAuctionSection />
         <HowItWorksSection />

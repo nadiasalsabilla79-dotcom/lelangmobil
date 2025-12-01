@@ -60,7 +60,9 @@ export default function VerifyEmailPage() {
       <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50 to-purple-100">
         <Card className="w-full max-w-md bg-white shadow-xl">
           <CardHeader className="text-center">
-            <Loader2 className="mx-auto h-16 w-16 text-blue-600 animate-spin mb-4" />
+            <div className="w-20 h-20 mx-auto mb-4">
+              <img src="/3d-icons/trophy-3d.png" alt="Loading" className="w-full h-full object-contain animate-pulse" />
+            </div>
             <CardTitle>Memverifikasi Email</CardTitle>
             <CardDescription>Mohon tunggu, sedang memverifikasi email Anda...</CardDescription>
           </CardHeader>
@@ -74,7 +76,9 @@ export default function VerifyEmailPage() {
       <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50 to-purple-100">
         <Card className="w-full max-w-md bg-white shadow-xl">
           <CardHeader className="text-center">
-            <CheckCircle className="mx-auto h-16 w-16 text-green-600 mb-4" />
+            <div className="w-20 h-20 mx-auto mb-4">
+            <img src="/3d-icons/shield-3d.png" alt="Verified" className="w-full h-full object-contain" />
+          </div>
             <CardTitle className="text-green-600">Email Terverifikasi</CardTitle>
             <CardDescription>
               Selamat! Email Anda berhasil diverifikasi. Anda sekarang dapat menggunakan semua fitur platform.
@@ -97,7 +101,9 @@ export default function VerifyEmailPage() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50 to-purple-100">
       <Card className="w-full max-w-md bg-white shadow-xl">
         <CardHeader className="text-center">
-          <XCircle className="mx-auto h-16 w-16 text-red-600 mb-4" />
+          <div className="w-20 h-20 mx-auto mb-4">
+            <img src="/3d-icons/car-3d.png" alt="Error" className="w-full h-full object-contain filter grayscale" />
+          </div>
           <CardTitle className="text-red-600">Verifikasi Gagal</CardTitle>
           <CardDescription>
             Link verifikasi tidak valid atau sudah kedaluwarsa. Silakan minta link verifikasi baru.

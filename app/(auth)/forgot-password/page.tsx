@@ -36,7 +36,9 @@ export default function ForgotPasswordPage() {
       <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50 to-purple-100">
         <Card className="w-full max-w-md bg-white shadow-xl">
           <CardHeader className="text-center">
-            <CheckCircle className="mx-auto h-16 w-16 text-green-600 mb-4" />
+            <div className="w-20 h-20 mx-auto mb-4">
+              <img src="/3d-icons/gift-3d.png" alt="Email Sent" className="w-full h-full object-contain" />
+            </div>
             <CardTitle>Email Terkirim</CardTitle>
             <CardDescription>Link reset password dikirim ke {email}</CardDescription>
           </CardHeader>
