@@ -1,0 +1,318 @@
+================================================================================
+                    LELANGMOBIL - PLATFORM LELANG MOBIL ONLINE
+                         INSTALASI & PANDUAN PENGGUNAAN
+================================================================================
+
+📋 DAFTAR ISI:
+1. Persyaratan Sistem
+2. Cara Instalasi (Super Mudah!)
+3. Cara Menjalankan Aplikasi
+4. Akun Demo untuk Testing
+5. Fitur-Fitur yang Tersedia
+6. Troubleshooting
+7. Kontak Support
+
+================================================================================
+1. PERSYARATAN SISTEM
+================================================================================
+
+✅ Node.js versi 18 atau lebih baru
+   Download di: https://nodejs.org/
+
+✅ Browser modern (Chrome, Firefox, Safari, Edge)
+
+✅ Koneksi internet (untuk download dependencies)
+
+✅ Minimal 2GB RAM
+
+✅ Minimal 500MB storage kosong
+
+================================================================================
+2. CARA INSTALASI (SUPER MUDAH!)
+================================================================================
+
+OPSI 1: INSTALASI OTOMATIS (RECOMMENDED) ⭐
+-------------------------------------------
+1. Buka folder proyek
+2. Double-click file "INSTALL.bat"
+3. Tunggu proses instalasi selesai (3-5 menit)
+4. Selesai! Aplikasi siap digunakan
+
+OPSI 2: INSTALASI MANUAL
+-------------------------
+1. Buka Command Prompt / Terminal
+2. Masuk ke folder proyek:
+   cd "d:\New folder (15)"
+
+3. Install dependencies:
+   pnpm install
+   (atau: npm install jika tidak punya pnpm)
+
+4. Tunggu hingga selesai
+5. Selesai!
+
+================================================================================
+3. CARA MENJALANKAN APLIKASI
+================================================================================
+
+OPSI 1: MENGGUNAKAN SCRIPT (TERMUDAH) ⭐
+----------------------------------------
+1. Double-click file "START.bat"
+2. Tunggu server menyala
+3. Browser akan otomatis membuka http://localhost:3000
+4. Selesai! Aplikasi sudah berjalan
+
+OPSI 2: MANUAL
+--------------
+1. Buka Command Prompt / Terminal
+2. Masuk ke folder proyek
+3. Jalankan perintah:
+   pnpm dev
+   (atau: npm run dev)
+
+4. Buka browser dan akses:
+   http://localhost:3000
+
+5. Untuk menghentikan server:
+   Tekan Ctrl + C di terminal
+
+================================================================================
+4. AKUN DEMO UNTUK TESTING
+================================================================================
+
+USER ACCOUNT (Sudah KYC & Ada Saldo) ⭐
+---------------------------------------
+Email    : budi@gmail.com
+Password : password123
+Saldo    : Rp 25.000.000
+Status   : KYC Approved
+
+Gunakan akun ini untuk:
+- Melihat dashboard user
+- Melakukan bid pada lelang
+- Deposit & withdraw saldo
+- Melihat riwayat transaksi
+
+ADMIN ACCOUNT ⭐
+----------------
+Email    : admin@lelangmobil.com
+Password : password123
+Role     : Administrator
+
+Gunakan akun ini untuk:
+- Approve KYC user
+- Approve deposit & withdraw
+- Mengelola lelang
+- Mengelola mobil
+- Melihat laporan
+
+USER LAIN (Belum KYC)
+---------------------
+Email    : siti@gmail.com
+Password : password123
+
+Email    : ahmad@gmail.com
+Password : password123
+
+Gunakan akun ini untuk:
+- Testing flow KYC
+- Testing registrasi baru
+
+================================================================================
+5. FITUR-FITUR YANG TERSEDIA
+================================================================================
+
+FITUR USER:
+-----------
+✅ Register & Login
+✅ Verifikasi KYC (Upload KTP & Selfie)
+✅ Wallet Management (Deposit & Withdraw)
+✅ Browse Lelang dengan Filter & Search
+✅ Lihat Detail Mobil dengan Galeri Foto
+✅ Pasang Bid pada Lelang Aktif
+✅ Lihat Riwayat Bid
+✅ Dashboard dengan Statistik
+✅ Riwayat Transaksi
+✅ Notifikasi Real-time
+✅ Manajemen Profil
+
+FITUR ADMIN:
+------------
+✅ Dashboard Admin dengan Statistik
+✅ Manajemen User (View, Edit)
+✅ Approve/Reject KYC
+✅ Approve/Reject Deposit & Withdraw
+✅ Manajemen Lelang (Create, Edit, Delete)
+✅ Manajemen Mobil (Create, Edit, Delete)
+✅ Laporan Keuangan
+✅ Pengaturan Sistem
+
+FITUR UI/UX:
+------------
+✅ Responsive Design (Mobile, Tablet, Desktop)
+✅ Tampilan Modern & Clean
+✅ Animasi Smooth
+✅ Loading States
+✅ Error Handling
+✅ Toast Notifications
+✅ Modal Dialogs
+✅ Form Validation
+✅ Image Gallery
+✅ Countdown Timer Real-time
+✅ Search & Filter
+✅ Sort Options
+
+================================================================================
+6. TROUBLESHOOTING
+================================================================================
+
+MASALAH: Port 3000 sudah digunakan
+SOLUSI:
+  pnpm dev -- -p 3001
+  (gunakan port lain)
+
+MASALAH: Dependencies error saat install
+SOLUSI:
+  1. Hapus folder node_modules
+  2. Hapus file pnpm-lock.yaml atau package-lock.json
+  3. Install ulang: pnpm install
+
+MASALAH: Tailwind classes tidak muncul
+SOLUSI:
+  1. Stop server (Ctrl+C)
+  2. Jalankan ulang: pnpm dev
+
+MASALAH: Images tidak muncul
+SOLUSI:
+  1. Pastikan file ada di folder /public
+  2. Check path nya benar (case-sensitive)
+  3. Refresh browser (Ctrl+F5)
+
+MASALAH: Store tidak persist (data hilang setelah refresh)
+SOLUSI:
+  1. Check browser localStorage
+  2. Clear cache browser
+  3. Jangan gunakan incognito mode
+
+MASALAH: Node.js tidak terdeteksi
+SOLUSI:
+  1. Install Node.js dari https://nodejs.org/
+  2. Restart Command Prompt
+  3. Coba lagi
+
+================================================================================
+7. STRUKTUR FOLDER
+================================================================================
+
+lelangmobil/
+├── app/                    # Halaman-halaman aplikasi
+│   ├── (auth)/            # Halaman login & register
+│   ├── admin/             # Dashboard admin
+│   ├── dashboard/         # Dashboard user
+│   └── lelang/            # Halaman lelang
+├── components/            # Komponen React
+│   ├── auction/          # Komponen lelang
+│   ├── home/             # Komponen homepage
+│   ├── ui/               # Komponen UI
+│   └── wallet/           # Komponen wallet
+├── lib/                   # Utilities & helpers
+│   ├── utils/            # Fungsi helper
+│   ├── dummy-data.ts     # Data dummy untuk testing
+│   ├── store.ts          # State management
+│   └── types.ts          # Type definitions
+├── public/               # File statis (gambar, dll)
+├── INSTALL.bat           # Script instalasi otomatis
+├── START.bat             # Script untuk menjalankan app
+└── README.md             # Dokumentasi lengkap
+
+================================================================================
+8. TIPS PENGGUNAAN
+================================================================================
+
+1. TESTING FLOW LENGKAP:
+   - Login sebagai user baru
+   - Submit KYC
+   - Login sebagai admin
+   - Approve KYC
+   - Login kembali sebagai user
+   - Deposit saldo
+   - Browse lelang
+   - Pasang bid
+   - Menangkan lelang
+
+2. TESTING RESPONSIVE:
+   - Buka DevTools (F12)
+   - Toggle device toolbar (Ctrl+Shift+M)
+   - Test di berbagai ukuran layar
+
+3. EXPLORE FITUR:
+   - Coba semua menu
+   - Test filter & search
+   - Upload gambar
+   - Lihat notifikasi
+   - Check riwayat transaksi
+
+4. CUSTOMIZE:
+   - Edit warna di app/globals.css
+   - Tambah fitur baru
+   - Improve UI/UX
+   - Deploy ke production
+
+================================================================================
+9. BUILD UNTUK PRODUCTION
+================================================================================
+
+Jika ingin build untuk production:
+
+1. Build aplikasi:
+   pnpm build
+
+2. Jalankan production server:
+   pnpm start
+
+3. Aplikasi akan berjalan di:
+   http://localhost:3000
+
+================================================================================
+10. KONTAK SUPPORT
+================================================================================
+
+Jika ada pertanyaan atau masalah:
+
+📧 Email: support@lelangmobil.com
+📱 WhatsApp: +62 21 1234 5678
+💬 Discord: [Join our Discord]
+🐛 GitHub Issues: [Report Bug]
+
+================================================================================
+11. DOKUMENTASI LENGKAP
+================================================================================
+
+Untuk dokumentasi lebih lengkap, baca file-file berikut:
+
+📖 README.md                    - Dokumentasi utama
+📖 QUICKSTART.md                - Quick start guide
+📖 PERBAIKAN_LENGKAP.md         - Daftar perbaikan
+📖 CHANGELOG.md                 - Version history
+📖 API_DOCUMENTATION.md         - API documentation
+📖 CONTRIBUTING.md              - Contribution guide
+
+================================================================================
+12. LISENSI
+================================================================================
+
+Proyek ini menggunakan MIT License.
+Lihat file LICENSE untuk detail lengkap.
+
+================================================================================
+
+                        SELAMAT MENCOBA! 🚀
+
+         Jika ada pertanyaan, jangan ragu untuk menghubungi kami!
+
+================================================================================
+
+Dibuat dengan ❤️ oleh LelangMobil Team
+Last Updated: 27 Januari 2024
+
+================================================================================

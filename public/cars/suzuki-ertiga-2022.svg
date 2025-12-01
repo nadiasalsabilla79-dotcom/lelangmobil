@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" fill="none">
+  <defs>
+    <linearGradient id="ertigaBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="400" fill="#f1f5f9"/>
+  
+  <!-- Shadow -->
+  <ellipse cx="300" cy="350" rx="195" ry="20" fill="#000000" opacity="0.1"/>
+  
+  <!-- Car Body -->
+  <path d="M 105 205 L 153 165 L 275 165 L 323 205 L 495 205 L 495 285 L 105 285 Z" fill="url(#ertigaBody)" stroke="#94a3b8" stroke-width="2"/>
+  
+  <!-- Roof -->
+  <path d="M 183 165 L 203 125 L 393 125 L 413 165 Z" fill="url(#ertigaBody)" stroke="#94a3b8" stroke-width="2"/>
+  
+  <!-- Windows -->
+  <path d="M 193 160 L 208 130 L 305 130 L 305 160 Z" fill="#60a5fa" opacity="0.6" stroke="#475569" stroke-width="1.5"/>
+  <path d="M 315 160 L 315 130 L 388 130 L 408 160 Z" fill="#60a5fa" opacity="0.6" stroke="#475569" stroke-width="1.5"/>
+  
+  <!-- Doors -->
+  <line x1="275" y1="175" x2="275" y2="285" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="375" y1="175" x2="375" y2="285" stroke="#94a3b8" stroke-width="2"/>
+  
+  <!-- Headlights -->
+  <ellipse cx="485" cy="225" rx="11" ry="14" fill="#fef3c7" stroke="#fbbf24" stroke-width="2"/>
+  <ellipse cx="485" cy="253" rx="10" ry="12" fill="#fef3c7" stroke="#fbbf24" stroke-width="2"/>
+  
+  <!-- Taillights -->
+  <rect x="110" y="220" width="10" height="28" rx="3" fill="#fca5a5" stroke="#ef4444" stroke-width="1.5"/>
+  <rect x="110" y="252" width="10" height="23" rx="3" fill="#fca5a5" stroke="#ef4444" stroke-width="1.5"/>
+  
+  <!-- Wheels -->
+  <circle cx="205" cy="285" r="40" fill="#1e293b"/>
+  <circle cx="205" cy="285" r="30" fill="#475569"/>
+  <circle cx="205" cy="285" r="15" fill="#94a3b8"/>
+  
+  <circle cx="415" cy="285" r="40" fill="#1e293b"/>
+  <circle cx="415" cy="285" r="30" fill="#475569"/>
+  <circle cx="415" cy="285" r="15" fill="#94a3b8"/>
+  
+  <!-- Grille -->
+  <rect x="480" y="205" width="15" height="80" rx="2" fill="#334155"/>
+  <line x1="482" y1="215" x2="493" y2="215" stroke="#64748b" stroke-width="1"/>
+  <line x1="482" y1="225" x2="493" y2="225" stroke="#64748b" stroke-width="1"/>
+  <line x1="482" y1="235" x2="493" y2="235" stroke="#64748b" stroke-width="1"/>
+  <line x1="482" y1="245" x2="493" y2="245" stroke="#64748b" stroke-width="1"/>
+  <line x1="482" y1="255" x2="493" y2="255" stroke="#64748b" stroke-width="1"/>
+  <line x1="482" y1="265" x2="493" y2="265" stroke="#64748b" stroke-width="1"/>
+  <line x1="482" y1="275" x2="493" y2="275" stroke="#64748b" stroke-width="1"/>
+  
+  <!-- Side Mirror -->
+  <ellipse cx="475" cy="185" rx="10" ry="6" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.5"/>
+  
+  <!-- Badge -->
+  <text x="300" y="255" font-size="15" font-weight="bold" fill="#64748b" text-anchor="middle">ERTIGA</text>
+</svg>

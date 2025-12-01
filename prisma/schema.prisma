@@ -1,0 +1,182 @@
+// Prisma Schema untuk LelangMobil
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  name          String
+  phone         String?
+  role          Role     @default(USER)
+  kycStatus     KYCStatus @default(PENDING)
+  kycKtpUrl     String?
+  kycSelfieUrl  String?
+  kycRejectedReason String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  wallet        Wallet?
+  bids          Bid[]
+  transactions  Transaction[]
+  notifications Notification[]
+
+  @@index([email])
+}
+
+model Wallet {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  balance       Decimal  @default(0) @db.Decimal(15, 2)
+  holdBalance   Decimal  @default(0) @db.Decimal(15, 2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  userId        String
+  type          TransactionType
+  amount        Decimal  @db.Decimal(15, 2)
+  status        TransactionStatus @default(PENDING)
+  bankName      String?
+  accountNumber String?
+  accountName   String?
+  proofUrl      String?
+  notes         String?  @db.Text
+  adminNotes    String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Car {
+  id            String   @id @default(cuid())
+  brand         String
+  model         String
+  year          Int
+  color         String
+  transmission  String
+  fuelType      String
+  odometer      Int
+  location      String
+  grade         String
+  description   String   @db.Text
+  images        Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  auctions      Auction[]
+
+  @@index([brand])
+  @@index([location])
+}
+
+model Auction {
+  id            String   @id @default(cuid())
+  carId         String
+  title         String
+  startPrice    Decimal  @db.Decimal(15, 2)
+  currentPrice  Decimal  @db.Decimal(15, 2)
+  minIncrement  Decimal  @db.Decimal(15, 2)
+  startTime     DateTime
+  endTime       DateTime
+  status        AuctionStatus @default(DRAFT)
+  winnerId      String?
+  totalBids     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  car           Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  bids          Bid[]
+
+  @@index([status])
+  @@index([startTime])
+  @@index([endTime])
+}
+
+model Bid {
+  id            String   @id @default(cuid())
+  auctionId     String
+  userId        String
+  amount        Decimal  @db.Decimal(15, 2)
+  isWinning     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  auction       Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([auctionId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Notification {
+  id            String   @id @default(cuid())
+  userId        String
+  title         String
+  message       String   @db.Text
+  type          NotificationType
+  isRead        Boolean  @default(false)
+  link          String?
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum KYCStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+  BID_HOLD
+  BID_RELEASE
+  BID_WIN
+  BONUS
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum AuctionStatus {
+  DRAFT
+  UPCOMING
+  LIVE
+  ENDED
+}
+
+enum NotificationType {
+  KYC
+  TRANSACTION
+  BID
+  AUCTION
+  SYSTEM
+}

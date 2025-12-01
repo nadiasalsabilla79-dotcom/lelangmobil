@@ -1,0 +1,4 @@
+lelangmobil.com, www.lelangmobil.com {
+    encode gzip
+    reverse_proxy app:3000
+}

@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "mysql://username:password@host:3306/lelangmobil",
+    "NEXT_PUBLIC_APP_URL": "https://lelangmobil.com",
+    "JWT_SECRET": "lelangmobil-production-jwt-secret-key-2025-secure"
+  }
+}

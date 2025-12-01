@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" fill="none">
+  <defs>
+    <linearGradient id="brioBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#991b1b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="400" fill="#fef2f2"/>
+  
+  <!-- Shadow -->
+  <ellipse cx="300" cy="345" rx="180" ry="18" fill="#000000" opacity="0.1"/>
+  
+  <!-- Car Body (Compact) -->
+  <path d="M 110 210 L 155 170 L 270 170 L 315 210 L 490 210 L 490 285 L 110 285 Z" fill="url(#brioBody)" stroke="#7f1d1d" stroke-width="2"/>
+  
+  <!-- Roof -->
+  <path d="M 185 170 L 205 135 L 385 135 L 405 170 Z" fill="url(#brioBody)" stroke="#7f1d1d" stroke-width="2"/>
+  
+  <!-- Windows -->
+  <path d="M 195 165 L 210 140 L 295 140 L 295 165 Z" fill="#93c5fd" opacity="0.6" stroke="#1e3a8a" stroke-width="1.5"/>
+  <path d="M 305 165 L 305 140 L 380 140 L 400 165 Z" fill="#93c5fd" opacity="0.6" stroke="#1e3a8a" stroke-width="1.5"/>
+  
+  <!-- Doors -->
+  <line x1="270" y1="180" x2="270" y2="285" stroke="#7f1d1d" stroke-width="2"/>
+  <line x1="365" y1="180" x2="365" y2="285" stroke="#7f1d1d" stroke-width="2"/>
+  
+  <!-- Headlights -->
+  <ellipse cx="480" cy="230" rx="11" ry="14" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <ellipse cx="480" cy="255" rx="9" ry="11" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  
+  <!-- Taillights -->
+  <rect x="115" y="225" width="9" height="30" rx="3" fill="#fca5a5" stroke="#dc2626" stroke-width="1.5"/>
+  
+  <!-- Wheels -->
+  <circle cx="200" cy="285" r="38" fill="#1e293b"/>
+  <circle cx="200" cy="285" r="28" fill="#475569"/>
+  <circle cx="200" cy="285" r="14" fill="#94a3b8"/>
+  
+  <circle cx="410" cy="285" r="38" fill="#1e293b"/>
+  <circle cx="410" cy="285" r="28" fill="#475569"/>
+  <circle cx="410" cy="285" r="14" fill="#94a3b8"/>
+  
+  <!-- Grille -->
+  <rect x="475" y="210" width="15" height="75" rx="2" fill="#7f1d1d"/>
+  
+  <!-- Side Mirror -->
+  <ellipse cx="475" cy="190" rx="9" ry="6" fill="#991b1b" stroke="#7f1d1d" stroke-width="1.5"/>
+  
+  <!-- Badge -->
+  <text x="300" y="255" font-size="14" font-weight="bold" fill="#fecaca" text-anchor="middle">BRIO RS</text>
+</svg>

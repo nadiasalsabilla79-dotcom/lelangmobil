@@ -1,0 +1,48 @@
+========================================
+   MANUAL GITHUB UPLOAD COMMANDS
+========================================
+
+Setelah Git terinstall, jalankan commands berikut di Command Prompt:
+
+1. Masuk ke folder project:
+   cd "c:\Users\opc\Desktop\New folder (15)"
+
+2. Initialize Git:
+   git init
+
+3. Add semua files:
+   git add .
+
+4. Create commit:
+   git commit -m "Initial commit - LelangMobil Platform"
+
+5. Buat repository di GitHub:
+   - Buka: https://github.com/new
+   - Repository name: lelangmobil
+   - Klik "Create repository"
+
+6. Connect dan push:
+   git remote add origin https://github.com/USERNAME/lelangmobil.git
+   git branch -M main
+   git push -u origin main
+
+   (Ganti USERNAME dengan username GitHub Anda)
+
+========================================
+SETELAH UPLOAD KE GITHUB:
+========================================
+
+1. Deploy ke Vercel:
+   - Login ke https://vercel.com
+   - Import Git Repository
+   - Select: lelangmobil
+   - Deploy
+
+2. Set Environment Variables di Vercel:
+   DATABASE_URL=mysql://username:password@host:3306/lelangmobil
+   NEXT_PUBLIC_APP_URL=https://lelangmobil.vercel.app
+   JWT_SECRET=lelangmobil-production-jwt-secret-key-2025-secure
+
+========================================
+DONE! Website akan live di Vercel!
+========================================
