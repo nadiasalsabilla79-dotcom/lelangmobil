@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Save, Building, CreditCard, Bell, Shield } from "lucide-react"
+import { Save, Building, CreditCard, Bell, Shield, Palette } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -52,7 +52,7 @@ export default function AdminPengaturanPage() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="general">
             <Building className="mr-2 h-4 w-4" />
             Umum
@@ -68,6 +68,10 @@ export default function AdminPengaturanPage() {
           <TabsTrigger value="security">
             <Shield className="mr-2 h-4 w-4" />
             Keamanan
+          </TabsTrigger>
+          <TabsTrigger value="customization">
+            <Palette className="mr-2 h-4 w-4" />
+            Customization
           </TabsTrigger>
         </TabsList>
 
@@ -250,6 +254,108 @@ export default function AdminPengaturanPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="customization">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Theme & Colors</CardTitle>
+                <CardDescription>Kustomisasi warna dan tema website</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Primary Color</Label>
+                    <div className="flex gap-2">
+                      <Input type="color" value="#1e3a8a" className="w-16 h-10 p-1" />
+                      <Input value="#1e3a8a" placeholder="#1e3a8a" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Secondary Color</Label>
+                    <div className="flex gap-2">
+                      <Input type="color" value="#f59e0b" className="w-16 h-10 p-1" />
+                      <Input value="#f59e0b" placeholder="#f59e0b" />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Hero Section</CardTitle>
+                <CardDescription>Kustomisasi bagian hero homepage</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Hero Title</Label>
+                  <Input value="Platform Lelang Mobil Terpercaya" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Hero Subtitle</Label>
+                  <Textarea value="Dapatkan mobil impian dengan harga terbaik" rows={2} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Hero Banner</Label>
+                  <div className="flex gap-2">
+                    <Input placeholder="Upload banner image" />
+                    <Button>Upload</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Promo Banner</CardTitle>
+                <CardDescription>Banner promosi di bagian atas</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Show Promo Banner</p>
+                    <p className="text-sm text-muted-foreground">Tampilkan banner promosi</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="space-y-2">
+                  <Label>Banner Text</Label>
+                  <Input value="🎉 Bonus Rp 1.000.000 untuk member baru yang verifikasi KYC!" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Banner Color</Label>
+                  <div className="flex gap-2">
+                    <Input type="color" value="#10b981" className="w-16 h-10 p-1" />
+                    <Input value="#10b981" placeholder="#10b981" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Logo & Branding</CardTitle>
+                <CardDescription>Upload logo dan atur branding</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Site Logo</Label>
+                    <div className="flex gap-2">
+                      <Input placeholder="Upload logo" />
+                      <Button>Upload</Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Site Name</Label>
+                    <Input value="LelangMobil" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
