@@ -15,6 +15,10 @@ model User {
   name          String
   phone         String?
   role          Role     @default(USER)
+  emailVerified Boolean  @default(false)
+  emailVerifyToken String?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
   kycStatus     KYCStatus @default(PENDING)
   kycKtpUrl     String?
   kycSelfieUrl  String?

@@ -37,6 +37,17 @@ export default function LoginPage() {
     const user = dummyUsers.find((u) => u.email === email)
 
     if (user && password === "password123") {
+      // Check email verification for non-admin users
+      if (user.role === "USER" && !user.emailVerified) {
+        toast({
+          title: "Email Belum Diverifikasi",
+          description: "Silakan verifikasi email Anda terlebih dahulu",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
+      }
+
       const wallet = dummyWallets.find((w) => w.userId === user.id)
       const kyc = dummyKYC.find((k) => k.userId === user.id)
 

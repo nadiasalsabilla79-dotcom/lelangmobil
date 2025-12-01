@@ -19,6 +19,7 @@ async function main() {
       name: 'Administrator',
       phone: '081234567890',
       role: 'ADMIN',
+      emailVerified: true, // Admin tidak perlu verifikasi
       kycStatus: 'APPROVED',
     },
   })
@@ -43,6 +44,7 @@ async function main() {
       name: 'Budi Santoso',
       phone: '081234567891',
       role: 'USER',
+      emailVerified: true, // Demo user sudah verified
       kycStatus: 'APPROVED',
     },
   })
