@@ -1,293 +1,323 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
-import { ShieldCheck, Eye, CheckCircle, XCircle, Clock } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Search, Shield, CheckCircle, XCircle, Clock, Eye, Download } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { dummyKYC, dummyUsers } from "@/lib/dummy-data"
-import { formatDateTime, getStatusColor, getStatusText } from "@/lib/utils/format"
+import Image from "next/image"
 
 export default function AdminKYCPage() {
   const { toast } = useToast()
-  const [kycList, setKycList] = useState(dummyKYC)
-  const [selectedKYC, setSelectedKYC] = useState<(typeof dummyKYC)[0] | null>(null)
-  const [showDetailDialog, setShowDetailDialog] = useState(false)
-  const [rejectReason, setRejectReason] = useState("")
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [kycData, setKycData] = useState(dummyKYC)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedKyc, setSelectedKyc] = useState<any>(null)
+  const [rejectionReason, setRejectionReason] = useState("")
 
-  const pendingKYC = kycList.filter((k) => k.status === "PENDING")
-  const approvedKYC = kycList.filter((k) => k.status === "APPROVED")
-  const rejectedKYC = kycList.filter((k) => k.status === "REJECTED")
+  const filteredKyc = kycData.filter(kyc => {
+    const user = dummyUsers.find(u => u.id === kyc.userId)
+    return user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           kyc.ktpNumber.includes(searchTerm)
+  })
 
   const getUserName = (userId: string) => {
-    return dummyUsers.find((u) => u.id === userId)?.name || "Unknown"
+    return dummyUsers.find(u => u.id === userId)?.name || "Unknown"
   }
 
   const getUserEmail = (userId: string) => {
-    return dummyUsers.find((u) => u.id === userId)?.email || "Unknown"
+    return dummyUsers.find(u => u.id === userId)?.email || "Unknown"
   }
 
-  const handleApprove = async (kyc: (typeof dummyKYC)[0]) => {
-    setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      PENDING: "bg-yellow-100 text-yellow-800",
+      APPROVED: "bg-green-100 text-green-800",
+      REJECTED: "bg-red-100 text-red-800",
+    }
+    return variants[status as keyof typeof variants] || variants.PENDING
+  }
 
-    // Update KYC status
-    setKycList(
-      kycList.map((k) =>
-        k.id === kyc.id ? { ...k, status: "APPROVED" as const, approvedAt: new Date(), approvedBy: "admin-1" } : k,
-      ),
-    )
-
-    // PENTING: Bonus Rp 1.000.000 diberikan di sini setelah admin approve
+  const handleApprove = (kycId: string) => {
+    setKycData(kycData.map(kyc => 
+      kyc.id === kycId 
+        ? { ...kyc, status: "APPROVED", approvedAt: new Date(), approvedBy: "user-1" }
+        : kyc
+    ))
     toast({
       title: "KYC Disetujui",
-      description: `KYC ${getUserName(kyc.userId)} berhasil disetujui. Bonus Rp 1.000.000 telah ditambahkan ke wallet.`,
+      description: "Verifikasi KYC berhasil disetujui. Bonus Rp 1.000.000 telah dikirim.",
     })
-
-    setIsProcessing(false)
-    setShowDetailDialog(false)
-    setSelectedKYC(null)
   }
 
-  const handleReject = async (kyc: (typeof dummyKYC)[0]) => {
-    if (!rejectReason) {
+  const handleReject = (kycId: string) => {
+    if (!rejectionReason.trim()) {
       toast({
-        title: "Error",
-        description: "Mohon berikan alasan penolakan",
+        title: "Alasan Diperlukan",
+        description: "Silakan masukkan alasan penolakan",
         variant: "destructive",
       })
       return
     }
 
-    setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    setKycList(
-      kycList.map((k) => (k.id === kyc.id ? { ...k, status: "REJECTED" as const, rejectionReason: rejectReason } : k)),
-    )
-
+    setKycData(kycData.map(kyc => 
+      kyc.id === kycId 
+        ? { ...kyc, status: "REJECTED", rejectedReason: rejectionReason }
+        : kyc
+    ))
+    setRejectionReason("")
+    setSelectedKyc(null)
     toast({
       title: "KYC Ditolak",
-      description: `KYC ${getUserName(kyc.userId)} telah ditolak.`,
+      description: "Verifikasi KYC telah ditolak dengan alasan yang diberikan.",
     })
-
-    setIsProcessing(false)
-    setShowDetailDialog(false)
-    setSelectedKYC(null)
-    setRejectReason("")
   }
 
-  const KYCTable = ({ data }: { data: typeof dummyKYC }) => (
-    <div className="space-y-3">
-      {data.length === 0 ? (
-        <div className="text-center py-8">
-          <ShieldCheck className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground">Tidak ada data</p>
-        </div>
-      ) : (
-        data.map((kyc) => (
-          <div
-            key={kyc.id}
-            className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-          >
-            <div className="flex items-center gap-4">
-              <div className="relative h-12 w-12 rounded-lg overflow-hidden">
-                <Image src={kyc.selfieImageUrl || "/placeholder.svg"} alt="Selfie" fill className="object-cover" />
-              </div>
-              <div>
-                <p className="font-medium">{getUserName(kyc.userId)}</p>
-                <p className="text-sm text-muted-foreground">{getUserEmail(kyc.userId)}</p>
-                <p className="text-xs text-muted-foreground">NIK: {kyc.ktpNumber}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <Badge className={getStatusColor(kyc.status)}>{getStatusText(kyc.status)}</Badge>
-                <p className="text-xs text-muted-foreground mt-1">{formatDateTime(kyc.createdAt)}</p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSelectedKYC(kyc)
-                  setShowDetailDialog(true)
-                }}
-              >
-                <Eye className="h-4 w-4 mr-1" />
-                Detail
-              </Button>
-            </div>
-          </div>
-        ))
-      )}
-    </div>
-  )
+  const pendingCount = kycData.filter(k => k.status === "PENDING").length
+  const approvedCount = kycData.filter(k => k.status === "APPROVED").length
+  const rejectedCount = kycData.filter(k => k.status === "REJECTED").length
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">KYC Manager</h1>
-          <p className="text-muted-foreground">Verifikasi identitas pengguna</p>
+          <h1 className="text-2xl font-bold gradient-text-2025">Verifikasi KYC</h1>
+          <p className="text-muted-foreground">Kelola verifikasi identitas pengguna</p>
         </div>
-        {pendingKYC.length > 0 && (
-          <Badge className="bg-warning text-warning-foreground">{pendingKYC.length} Menunggu</Badge>
-        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold">{kycData.length}</p>
+                <p className="text-sm text-muted-foreground">Total Pengajuan</p>
+              </div>
+              <Shield className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
+                <p className="text-sm text-muted-foreground">Menunggu Review</p>
+              </div>
+              <Clock className="h-8 w-8 text-yellow-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold text-green-600">{approvedCount}</p>
+                <p className="text-sm text-muted-foreground">Disetujui</p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold text-red-600">{rejectedCount}</p>
+                <p className="text-sm text-muted-foreground">Ditolak</p>
+              </div>
+              <XCircle className="h-8 w-8 text-red-600" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
-        <CardContent className="p-6">
-          <Tabs defaultValue="pending">
-            <TabsList className="mb-4">
-              <TabsTrigger value="pending" className="gap-2">
-                <Clock className="h-4 w-4" />
-                Menunggu ({pendingKYC.length})
-              </TabsTrigger>
-              <TabsTrigger value="approved" className="gap-2">
-                <CheckCircle className="h-4 w-4" />
-                Disetujui ({approvedKYC.length})
-              </TabsTrigger>
-              <TabsTrigger value="rejected" className="gap-2">
-                <XCircle className="h-4 w-4" />
-                Ditolak ({rejectedKYC.length})
-              </TabsTrigger>
-            </TabsList>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Daftar Pengajuan KYC ({filteredKyc.length})
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Cari pengajuan..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Pengguna</TableHead>
+                <TableHead>No. KTP</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Tanggal Pengajuan</TableHead>
+                <TableHead>Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredKyc.map((kyc) => (
+                <TableRow key={kyc.id}>
+                  <TableCell>
+                    <div>
+                      <p className="font-medium">{getUserName(kyc.userId)}</p>
+                      <p className="text-sm text-muted-foreground">{getUserEmail(kyc.userId)}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-mono">{kyc.ktpNumber}</TableCell>
+                  <TableCell>
+                    <Badge className={getStatusBadge(kyc.status)}>
+                      {kyc.status === "PENDING" && <Clock className="h-3 w-3 mr-1" />}
+                      {kyc.status === "APPROVED" && <CheckCircle className="h-3 w-3 mr-1" />}
+                      {kyc.status === "REJECTED" && <XCircle className="h-3 w-3 mr-1" />}
+                      {kyc.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{kyc.createdAt.toLocaleDateString('id-ID')}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" onClick={() => setSelectedKyc(kyc)}>
+                            <Eye className="h-4 w-4 mr-1" />
+                            Review
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">
+                          <DialogHeader>
+                            <DialogTitle>Review KYC - {getUserName(kyc.userId)}</DialogTitle>
+                          </DialogHeader>
+                          <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              <div>
+                                <Label className="text-sm font-medium">Foto KTP</Label>
+                                <div className="mt-2 border rounded-lg overflow-hidden">
+                                  <Image
+                                    src={kyc.ktpImageUrl}
+                                    alt="KTP"
+                                    width={400}
+                                    height={250}
+                                    className="w-full h-auto"
+                                  />
+                                </div>
+                                <Button variant="outline" size="sm" className="mt-2">
+                                  <Download className="h-4 w-4 mr-1" />
+                                  Download
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="space-y-4">
+                              <div>
+                                <Label className="text-sm font-medium">Foto Selfie dengan KTP</Label>
+                                <div className="mt-2 border rounded-lg overflow-hidden">
+                                  <Image
+                                    src={kyc.selfieImageUrl}
+                                    alt="Selfie"
+                                    width={400}
+                                    height={250}
+                                    className="w-full h-auto"
+                                  />
+                                </div>
+                                <Button variant="outline" size="sm" className="mt-2">
+                                  <Download className="h-4 w-4 mr-1" />
+                                  Download
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-4 mt-6">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label>Nama Lengkap</Label>
+                                <p className="text-sm font-medium">{getUserName(kyc.userId)}</p>
+                              </div>
+                              <div>
+                                <Label>Email</Label>
+                                <p className="text-sm font-medium">{getUserEmail(kyc.userId)}</p>
+                              </div>
+                              <div>
+                                <Label>No. KTP</Label>
+                                <p className="text-sm font-mono">{kyc.ktpNumber}</p>
+                              </div>
+                              <div>
+                                <Label>Status</Label>
+                                <Badge className={getStatusBadge(kyc.status)}>
+                                  {kyc.status}
+                                </Badge>
+                              </div>
+                            </div>
 
-            <TabsContent value="pending">
-              <KYCTable data={pendingKYC} />
-            </TabsContent>
-            <TabsContent value="approved">
-              <KYCTable data={approvedKYC} />
-            </TabsContent>
-            <TabsContent value="rejected">
-              <KYCTable data={rejectedKYC} />
-            </TabsContent>
-          </Tabs>
+                            {kyc.status === "PENDING" && (
+                              <div className="space-y-4 pt-4 border-t">
+                                <div className="space-y-2">
+                                  <Label>Alasan Penolakan (jika ditolak)</Label>
+                                  <Textarea
+                                    value={rejectionReason}
+                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    placeholder="Masukkan alasan jika KYC ditolak..."
+                                    rows={3}
+                                  />
+                                </div>
+                                <div className="flex justify-end gap-2">
+                                  <Button 
+                                    variant="destructive"
+                                    onClick={() => handleReject(kyc.id)}
+                                  >
+                                    <XCircle className="h-4 w-4 mr-1" />
+                                    Tolak
+                                  </Button>
+                                  <Button 
+                                    onClick={() => handleApprove(kyc.id)}
+                                    className="bg-green-600 hover:bg-green-700"
+                                  >
+                                    <CheckCircle className="h-4 w-4 mr-1" />
+                                    Setujui
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+
+                            {kyc.status === "REJECTED" && kyc.rejectedReason && (
+                              <div className="p-4 bg-red-50 rounded-lg">
+                                <Label className="text-red-800">Alasan Penolakan:</Label>
+                                <p className="text-sm text-red-700 mt-1">{kyc.rejectedReason}</p>
+                              </div>
+                            )}
+
+                            {kyc.status === "APPROVED" && (
+                              <div className="p-4 bg-green-50 rounded-lg">
+                                <p className="text-green-800 font-medium">✅ KYC Disetujui</p>
+                                <p className="text-sm text-green-700">
+                                  Disetujui pada: {kyc.approvedAt?.toLocaleDateString('id-ID')}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
-
-      {/* Detail Dialog */}
-      <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Detail KYC</DialogTitle>
-            <DialogDescription>Review dokumen verifikasi pengguna</DialogDescription>
-          </DialogHeader>
-
-          {selectedKYC && (
-            <div className="space-y-6">
-              {/* User Info */}
-              <div className="p-4 bg-muted rounded-lg">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Nama</p>
-                    <p className="font-medium">{getUserName(selectedKYC.userId)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Email</p>
-                    <p className="font-medium">{getUserEmail(selectedKYC.userId)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">NIK</p>
-                    <p className="font-medium font-mono">{selectedKYC.ktpNumber}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Tanggal Submit</p>
-                    <p className="font-medium">{formatDateTime(selectedKYC.createdAt)}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Documents */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium mb-2">Foto KTP</p>
-                  <div className="relative aspect-[3/2] rounded-lg overflow-hidden border">
-                    <Image
-                      src={selectedKYC.ktpImageUrl || "/placeholder.svg"}
-                      alt="KTP"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium mb-2">Selfie dengan KTP</p>
-                  <div className="relative aspect-[3/2] rounded-lg overflow-hidden border">
-                    <Image
-                      src={selectedKYC.selfieImageUrl || "/placeholder.svg"}
-                      alt="Selfie"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Status */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Status:</span>
-                <Badge className={getStatusColor(selectedKYC.status)}>{getStatusText(selectedKYC.status)}</Badge>
-              </div>
-
-              {/* Actions for Pending */}
-              {selectedKYC.status === "PENDING" && (
-                <div className="space-y-4 border-t pt-4">
-                  <div className="p-4 bg-warning/10 rounded-lg text-sm">
-                    <p className="font-medium text-warning-foreground mb-1">Penting!</p>
-                    <p className="text-muted-foreground">
-                      Jika KYC disetujui, sistem akan otomatis menambahkan bonus Rp 1.000.000 ke wallet pengguna.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Alasan Penolakan (jika ditolak)</label>
-                    <Textarea
-                      placeholder="Masukkan alasan penolakan..."
-                      value={rejectReason}
-                      onChange={(e) => setRejectReason(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Button
-                      className="flex-1 bg-success hover:bg-success/90"
-                      onClick={() => handleApprove(selectedKYC)}
-                      disabled={isProcessing}
-                    >
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Setujui KYC
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      className="flex-1"
-                      onClick={() => handleReject(selectedKYC)}
-                      disabled={isProcessing}
-                    >
-                      <XCircle className="mr-2 h-4 w-4" />
-                      Tolak KYC
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Rejection Reason */}
-              {selectedKYC.status === "REJECTED" && selectedKYC.rejectionReason && (
-                <div className="p-4 bg-destructive/10 rounded-lg">
-                  <p className="text-sm font-medium text-destructive mb-1">Alasan Penolakan:</p>
-                  <p className="text-sm text-muted-foreground">{selectedKYC.rejectionReason}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

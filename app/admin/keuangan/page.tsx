@@ -1,369 +1,391 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
-import { Wallet, ArrowDownLeft, ArrowUpRight, Eye, CheckCircle, XCircle } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Search, Wallet, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Eye, Download } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { dummyTransactions, dummyUsers } from "@/lib/dummy-data"
-import { formatRupiah, formatDateTime, getStatusColor, getStatusText } from "@/lib/utils/format"
-import { cn } from "@/lib/utils"
+import { formatRupiah } from "@/lib/utils/format"
+import Image from "next/image"
 
 export default function AdminKeuanganPage() {
   const { toast } = useToast()
   const [transactions, setTransactions] = useState(dummyTransactions)
-  const [selectedTransaction, setSelectedTransaction] = useState<(typeof dummyTransactions)[0] | null>(null)
-  const [showDetailDialog, setShowDetailDialog] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [rejectNotes, setRejectNotes] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null)
+  const [adminNotes, setAdminNotes] = useState("")
 
-  const deposits = transactions.filter((t) => t.type === "DEPOSIT")
-  const withdrawals = transactions.filter((t) => t.type === "WITHDRAW")
-  const pendingDeposits = deposits.filter((d) => d.status === "PENDING")
-  const pendingWithdrawals = withdrawals.filter((w) => w.status === "PENDING")
-
-  const totalPendingDeposit = pendingDeposits.reduce((sum, d) => sum + d.amount, 0)
-  const totalPendingWithdraw = pendingWithdrawals.reduce((sum, w) => sum + w.amount, 0)
+  const filteredTransactions = transactions.filter(trx => {
+    const user = dummyUsers.find(u => u.id === trx.userId)
+    return user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           trx.type.toLowerCase().includes(searchTerm.toLowerCase())
+  })
 
   const getUserName = (userId: string) => {
-    return dummyUsers.find((u) => u.id === userId)?.name || "Unknown"
+    return dummyUsers.find(u => u.id === userId)?.name || "Unknown"
   }
 
-  const handleApproveDeposit = async (trx: (typeof dummyTransactions)[0]) => {
-    setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+  const getUserEmail = (userId: string) => {
+    return dummyUsers.find(u => u.id === userId)?.email || "Unknown"
+  }
 
-    setTransactions(
-      transactions.map((t) =>
-        t.id === trx.id ? { ...t, status: "COMPLETED" as const, processedAt: new Date(), processedBy: "admin-1" } : t,
-      ),
-    )
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      PENDING: "bg-yellow-100 text-yellow-800",
+      APPROVED: "bg-green-100 text-green-800",
+      REJECTED: "bg-red-100 text-red-800",
+      COMPLETED: "bg-blue-100 text-blue-800",
+    }
+    return variants[status as keyof typeof variants] || variants.PENDING
+  }
 
+  const getTypeBadge = (type: string) => {
+    const variants = {
+      DEPOSIT: "bg-green-100 text-green-800",
+      WITHDRAW: "bg-red-100 text-red-800",
+      BONUS: "bg-purple-100 text-purple-800",
+      BID_HOLD: "bg-orange-100 text-orange-800",
+      BID_RELEASE: "bg-blue-100 text-blue-800",
+      BID_WIN: "bg-yellow-100 text-yellow-800",
+    }
+    return variants[type as keyof typeof variants] || variants.DEPOSIT
+  }
+
+  const handleApprove = (transactionId: string) => {
+    setTransactions(transactions.map(trx => 
+      trx.id === transactionId 
+        ? { ...trx, status: "COMPLETED", processedAt: new Date(), processedBy: "user-1", adminNotes }
+        : trx
+    ))
+    setAdminNotes("")
+    setSelectedTransaction(null)
     toast({
-      title: "Deposit Disetujui",
-      description: `Deposit ${formatRupiah(trx.amount)} dari ${getUserName(trx.userId)} telah dikonfirmasi. Saldo pengguna telah diupdate.`,
+      title: "Transaksi Disetujui",
+      description: "Transaksi berhasil disetujui dan diproses",
     })
-
-    setIsProcessing(false)
-    setShowDetailDialog(false)
   }
 
-  const handleRejectDeposit = async (trx: (typeof dummyTransactions)[0]) => {
-    setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+  const handleReject = (transactionId: string) => {
+    if (!adminNotes.trim()) {
+      toast({
+        title: "Catatan Diperlukan",
+        description: "Silakan masukkan catatan penolakan",
+        variant: "destructive",
+      })
+      return
+    }
 
-    setTransactions(
-      transactions.map((t) => (t.id === trx.id ? { ...t, status: "REJECTED" as const, notes: rejectNotes } : t)),
-    )
-
+    setTransactions(transactions.map(trx => 
+      trx.id === transactionId 
+        ? { ...trx, status: "REJECTED", processedAt: new Date(), processedBy: "user-1", adminNotes }
+        : trx
+    ))
+    setAdminNotes("")
+    setSelectedTransaction(null)
     toast({
-      title: "Deposit Ditolak",
-      description: `Deposit dari ${getUserName(trx.userId)} telah ditolak.`,
+      title: "Transaksi Ditolak",
+      description: "Transaksi telah ditolak dengan catatan yang diberikan",
     })
-
-    setIsProcessing(false)
-    setShowDetailDialog(false)
-    setRejectNotes("")
   }
 
-  const handleCompleteWithdraw = async (trx: (typeof dummyTransactions)[0]) => {
-    setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    setTransactions(
-      transactions.map((t) =>
-        t.id === trx.id ? { ...t, status: "COMPLETED" as const, processedAt: new Date(), processedBy: "admin-1" } : t,
-      ),
-    )
-
-    toast({
-      title: "Penarikan Selesai",
-      description: `Penarikan ${formatRupiah(trx.amount)} ke ${getUserName(trx.userId)} telah ditandai selesai.`,
-    })
-
-    setIsProcessing(false)
-    setShowDetailDialog(false)
-  }
-
-  const TransactionTable = ({ data, type }: { data: typeof dummyTransactions; type: "DEPOSIT" | "WITHDRAW" }) => (
-    <div className="space-y-3">
-      {data.length === 0 ? (
-        <div className="text-center py-8">
-          <Wallet className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground">Tidak ada transaksi</p>
-        </div>
-      ) : (
-        data.map((trx) => (
-          <div
-            key={trx.id}
-            className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className={cn(
-                  "h-10 w-10 rounded-full flex items-center justify-center",
-                  type === "DEPOSIT" ? "bg-success/20" : "bg-destructive/20",
-                )}
-              >
-                {type === "DEPOSIT" ? (
-                  <ArrowDownLeft className="h-5 w-5 text-success" />
-                ) : (
-                  <ArrowUpRight className="h-5 w-5 text-destructive" />
-                )}
-              </div>
-              <div>
-                <p className="font-medium">{getUserName(trx.userId)}</p>
-                <p className="text-sm text-muted-foreground">
-                  {trx.bankName} {trx.bankAccountNumber && `• ${trx.bankAccountNumber}`}
-                </p>
-                <p className="text-xs text-muted-foreground">{formatDateTime(trx.createdAt)}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className={cn("font-bold", type === "DEPOSIT" ? "text-success" : "text-destructive")}>
-                  {type === "DEPOSIT" ? "+" : "-"}
-                  {formatRupiah(trx.amount)}
-                </p>
-                <Badge className={getStatusColor(trx.status)}>{getStatusText(trx.status)}</Badge>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSelectedTransaction(trx)
-                  setShowDetailDialog(true)
-                }}
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ))
-      )}
-    </div>
-  )
+  const pendingTransactions = transactions.filter(t => t.status === "PENDING")
+  const completedTransactions = transactions.filter(t => t.status === "COMPLETED")
+  const totalDeposits = transactions.filter(t => t.type === "DEPOSIT" && t.status === "COMPLETED")
+    .reduce((sum, t) => sum + Number(t.amount), 0)
+  const totalWithdraws = transactions.filter(t => t.type === "WITHDRAW" && t.status === "COMPLETED")
+    .reduce((sum, t) => sum + Number(t.amount), 0)
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Keuangan</h1>
-          <p className="text-muted-foreground">Kelola deposit dan penarikan pengguna</p>
+          <h1 className="text-2xl font-bold gradient-text-2025">Manajemen Keuangan</h1>
+          <p className="text-muted-foreground">Kelola transaksi deposit dan withdraw</p>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
-                <ArrowDownLeft className="h-5 w-5 text-success" />
-              </div>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Deposit Menunggu</p>
-                <p className="text-xl font-bold">{pendingDeposits.length}</p>
-                <p className="text-sm text-success">{formatRupiah(totalPendingDeposit)}</p>
+                <p className="text-2xl font-bold text-yellow-600">{pendingTransactions.length}</p>
+                <p className="text-sm text-muted-foreground">Menunggu Approval</p>
               </div>
+              <Clock className="h-8 w-8 text-yellow-600" />
             </div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-destructive/20 flex items-center justify-center">
-                <ArrowUpRight className="h-5 w-5 text-destructive" />
-              </div>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Withdraw Menunggu</p>
-                <p className="text-xl font-bold">{pendingWithdrawals.length}</p>
-                <p className="text-sm text-destructive">{formatRupiah(totalPendingWithdraw)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-navy/20 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-navy" />
-              </div>
-              <div>
+                <p className="text-2xl font-bold text-green-600">{formatRupiah(totalDeposits)}</p>
                 <p className="text-sm text-muted-foreground">Total Deposit</p>
-                <p className="text-xl font-bold">{deposits.length}</p>
               </div>
+              <TrendingUp className="h-8 w-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                <Wallet className="h-5 w-5 text-muted-foreground" />
-              </div>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
+                <p className="text-2xl font-bold text-red-600">{formatRupiah(totalWithdraws)}</p>
                 <p className="text-sm text-muted-foreground">Total Withdraw</p>
-                <p className="text-xl font-bold">{withdrawals.length}</p>
               </div>
+              <TrendingDown className="h-8 w-8 text-red-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold">{completedTransactions.length}</p>
+                <p className="text-sm text-muted-foreground">Transaksi Selesai</p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Transactions */}
       <Card>
-        <CardContent className="p-6">
-          <Tabs defaultValue="deposits">
-            <TabsList className="mb-4">
-              <TabsTrigger value="deposits" className="gap-2">
-                <ArrowDownLeft className="h-4 w-4" />
-                Deposit ({deposits.length})
-              </TabsTrigger>
-              <TabsTrigger value="withdrawals" className="gap-2">
-                <ArrowUpRight className="h-4 w-4" />
-                Penarikan ({withdrawals.length})
-              </TabsTrigger>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Wallet className="h-5 w-5" />
+              Daftar Transaksi ({filteredTransactions.length})
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Cari transaksi..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="pending">
+            <TabsList>
+              <TabsTrigger value="pending">Menunggu ({pendingTransactions.length})</TabsTrigger>
+              <TabsTrigger value="all">Semua ({filteredTransactions.length})</TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="pending">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Pengguna</TableHead>
+                    <TableHead>Tipe</TableHead>
+                    <TableHead>Jumlah</TableHead>
+                    <TableHead>Bank</TableHead>
+                    <TableHead>Tanggal</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingTransactions.filter(trx => {
+                    const user = dummyUsers.find(u => u.id === trx.userId)
+                    return user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           trx.type.toLowerCase().includes(searchTerm.toLowerCase())
+                  }).map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{getUserName(transaction.userId)}</p>
+                          <p className="text-sm text-muted-foreground">{getUserEmail(transaction.userId)}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getTypeBadge(transaction.type)}>
+                          {transaction.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono">{formatRupiah(transaction.amount)}</TableCell>
+                      <TableCell>{transaction.bankName || "-"}</TableCell>
+                      <TableCell>{transaction.createdAt.toLocaleDateString('id-ID')}</TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadge(transaction.status)}>
+                          <Clock className="h-3 w-3 mr-1" />
+                          {transaction.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" onClick={() => setSelectedTransaction(transaction)}>
+                              <Eye className="h-4 w-4 mr-1" />
+                              Review
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Review Transaksi - {getUserName(transaction.userId)}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label>Pengguna</Label>
+                                  <p className="font-medium">{getUserName(transaction.userId)}</p>
+                                  <p className="text-sm text-muted-foreground">{getUserEmail(transaction.userId)}</p>
+                                </div>
+                                <div>
+                                  <Label>Tipe Transaksi</Label>
+                                  <Badge className={getTypeBadge(transaction.type)}>
+                                    {transaction.type}
+                                  </Badge>
+                                </div>
+                                <div>
+                                  <Label>Jumlah</Label>
+                                  <p className="font-mono text-lg">{formatRupiah(transaction.amount)}</p>
+                                </div>
+                                <div>
+                                  <Label>Bank</Label>
+                                  <p className="font-medium">{transaction.bankName || "-"}</p>
+                                </div>
+                                {transaction.accountNumber && (
+                                  <div>
+                                    <Label>No. Rekening</Label>
+                                    <p className="font-mono">{transaction.accountNumber}</p>
+                                  </div>
+                                )}
+                                {transaction.accountName && (
+                                  <div>
+                                    <Label>Nama Rekening</Label>
+                                    <p className="font-medium">{transaction.accountName}</p>
+                                  </div>
+                                )}
+                              </div>
 
-            <TabsContent value="deposits">
-              <TransactionTable data={deposits} type="DEPOSIT" />
+                              {transaction.notes && (
+                                <div>
+                                  <Label>Catatan Pengguna</Label>
+                                  <p className="text-sm bg-gray-50 p-3 rounded">{transaction.notes}</p>
+                                </div>
+                              )}
+
+                              {transaction.proofImageUrl && (
+                                <div>
+                                  <Label>Bukti Transfer</Label>
+                                  <div className="mt-2 border rounded-lg overflow-hidden">
+                                    <Image
+                                      src={transaction.proofImageUrl}
+                                      alt="Bukti Transfer"
+                                      width={400}
+                                      height={300}
+                                      className="w-full h-auto"
+                                    />
+                                  </div>
+                                  <Button variant="outline" size="sm" className="mt-2">
+                                    <Download className="h-4 w-4 mr-1" />
+                                    Download
+                                  </Button>
+                                </div>
+                              )}
+
+                              <div className="space-y-2">
+                                <Label>Catatan Admin</Label>
+                                <Textarea
+                                  value={adminNotes}
+                                  onChange={(e) => setAdminNotes(e.target.value)}
+                                  placeholder="Masukkan catatan untuk transaksi ini..."
+                                  rows={3}
+                                />
+                              </div>
+
+                              <div className="flex justify-end gap-2 pt-4 border-t">
+                                <Button 
+                                  variant="destructive"
+                                  onClick={() => handleReject(transaction.id)}
+                                >
+                                  <XCircle className="h-4 w-4 mr-1" />
+                                  Tolak
+                                </Button>
+                                <Button 
+                                  onClick={() => handleApprove(transaction.id)}
+                                  className="bg-green-600 hover:bg-green-700"
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Setujui
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </TabsContent>
-            <TabsContent value="withdrawals">
-              <TransactionTable data={withdrawals} type="WITHDRAW" />
+
+            <TabsContent value="all">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Pengguna</TableHead>
+                    <TableHead>Tipe</TableHead>
+                    <TableHead>Jumlah</TableHead>
+                    <TableHead>Bank</TableHead>
+                    <TableHead>Tanggal</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTransactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{getUserName(transaction.userId)}</p>
+                          <p className="text-sm text-muted-foreground">{getUserEmail(transaction.userId)}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getTypeBadge(transaction.type)}>
+                          {transaction.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono">{formatRupiah(transaction.amount)}</TableCell>
+                      <TableCell>{transaction.bankName || "-"}</TableCell>
+                      <TableCell>{transaction.createdAt.toLocaleDateString('id-ID')}</TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadge(transaction.status)}>
+                          {transaction.status === "PENDING" && <Clock className="h-3 w-3 mr-1" />}
+                          {transaction.status === "COMPLETED" && <CheckCircle className="h-3 w-3 mr-1" />}
+                          {transaction.status === "REJECTED" && <XCircle className="h-3 w-3 mr-1" />}
+                          {transaction.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
-
-      {/* Detail Dialog */}
-      <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Detail {selectedTransaction?.type === "DEPOSIT" ? "Deposit" : "Penarikan"}</DialogTitle>
-          </DialogHeader>
-
-          {selectedTransaction && (
-            <div className="space-y-6">
-              {/* Amount */}
-              <div className="text-center py-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Jumlah</p>
-                <p
-                  className={cn(
-                    "text-3xl font-bold",
-                    selectedTransaction.type === "DEPOSIT" ? "text-success" : "text-destructive",
-                  )}
-                >
-                  {formatRupiah(selectedTransaction.amount)}
-                </p>
-              </div>
-
-              {/* Details */}
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Pengguna</span>
-                  <span className="font-medium">{getUserName(selectedTransaction.userId)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Bank</span>
-                  <span className="font-medium">{selectedTransaction.bankName}</span>
-                </div>
-                {selectedTransaction.bankAccountNumber && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">No. Rekening</span>
-                    <span className="font-medium font-mono">{selectedTransaction.bankAccountNumber}</span>
-                  </div>
-                )}
-                {selectedTransaction.bankAccountName && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Atas Nama</span>
-                    <span className="font-medium">{selectedTransaction.bankAccountName}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tanggal</span>
-                  <span className="font-medium">{formatDateTime(selectedTransaction.createdAt)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Status</span>
-                  <Badge className={getStatusColor(selectedTransaction.status)}>
-                    {getStatusText(selectedTransaction.status)}
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Proof Image for Deposit */}
-              {selectedTransaction.type === "DEPOSIT" && selectedTransaction.proofImageUrl && (
-                <div>
-                  <p className="text-sm font-medium mb-2">Bukti Transfer</p>
-                  <div className="relative aspect-[3/4] max-h-64 mx-auto rounded-lg overflow-hidden border">
-                    <Image
-                      src={selectedTransaction.proofImageUrl || "/placeholder.svg"}
-                      alt="Bukti Transfer"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Actions for Pending */}
-              {selectedTransaction.status === "PENDING" && (
-                <div className="space-y-4 border-t pt-4">
-                  {selectedTransaction.type === "DEPOSIT" ? (
-                    <>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Catatan Penolakan (opsional)</label>
-                        <Textarea
-                          placeholder="Masukkan alasan penolakan..."
-                          value={rejectNotes}
-                          onChange={(e) => setRejectNotes(e.target.value)}
-                        />
-                      </div>
-                      <div className="flex gap-3">
-                        <Button
-                          className="flex-1 bg-success hover:bg-success/90"
-                          onClick={() => handleApproveDeposit(selectedTransaction)}
-                          disabled={isProcessing}
-                        >
-                          <CheckCircle className="mr-2 h-4 w-4" />
-                          Konfirmasi Deposit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          className="flex-1"
-                          onClick={() => handleRejectDeposit(selectedTransaction)}
-                          disabled={isProcessing}
-                        >
-                          <XCircle className="mr-2 h-4 w-4" />
-                          Tolak
-                        </Button>
-                      </div>
-                    </>
-                  ) : (
-                    <Button
-                      className="w-full bg-success hover:bg-success/90"
-                      onClick={() => handleCompleteWithdraw(selectedTransaction)}
-                      disabled={isProcessing}
-                    >
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Tandai Sudah Ditransfer
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
