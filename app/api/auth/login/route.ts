@@ -1,83 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { handleApiError, validateRequest } from '@/lib/utils/api-error'
-import { successResponse, errorResponse } from '@/lib/utils/api-response'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, password } = body
-
-    // Validate required fields
-    validateRequest(body, ['email', 'password'])
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return errorResponse('Format email tidak valid', 'INVALID_EMAIL', 400)
+    const { email, password } = await request.json()
+    
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'Email and password required' },
+        { status: 400 }
+      )
     }
-
-    // Find user with wallet
+    
+    // Find user
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
-      include: { wallet: true },
+      where: { email },
+      include: {
+        wallet: true
+      }
     })
-
+    
     if (!user) {
-      return errorResponse('Email atau password salah', 'INVALID_CREDENTIALS', 401)
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      )
     }
-
-    // Verify password
+    
+    // Check password
     const isValidPassword = await bcrypt.compare(password, user.password)
+    
     if (!isValidPassword) {
-      return errorResponse('Email atau password salah', 'INVALID_CREDENTIALS', 401)
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      )
     }
-
+    
+    // Check email verification for non-admin users
+    if (user.role === 'USER' && !user.emailVerified) {
+      return NextResponse.json(
+        { error: 'Please verify your email before logging in' },
+        { status: 403 }
+      )
+    }
+    
     // Generate JWT token
     const token = jwt.sign(
       { 
         userId: user.id, 
         email: user.email, 
-        role: user.role,
-        kycStatus: user.kycStatus 
+        role: user.role 
       },
-      process.env.JWT_SECRET || 'default-secret',
+      process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '7d' }
     )
-
+    
     // Remove password from response
-    const { password: _, ...userWithoutPassword } = user
-
-    // Create response with cookie
-    const response = successResponse(
-      {
-        token,
-        user: userWithoutPassword,
-      },
-      'Login berhasil'
-    )
-
-    // Set HTTP-only cookie for additional security
-    response.cookies.set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
+    const { password: _, emailVerifyToken, passwordResetToken, ...userWithoutSensitive } = user
+    
+    return NextResponse.json({
+      success: true,
+      user: userWithoutSensitive,
+      token,
+      message: 'Login successful'
     })
-
-    response.cookies.set('user-role', user.role, {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    })
-
-    return response
+    
   } catch (error) {
-    return handleApiError(error)
+    console.error('Login error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }
