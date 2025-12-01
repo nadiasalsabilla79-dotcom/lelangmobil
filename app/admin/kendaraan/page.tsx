@@ -30,6 +30,9 @@ export default function AdminKendaraanPage() {
     location: "",
     grade: "A",
     description: "",
+    engineCapacity: "",
+    taxStatus: "",
+    taxExpiry: "",
   })
 
   const filteredCars = cars.filter(car =>
@@ -59,6 +62,9 @@ export default function AdminKendaraanPage() {
       location: "",
       grade: "A",
       description: "",
+      engineCapacity: "",
+      taxStatus: "",
+      taxExpiry: "",
     })
     toast({
       title: "Kendaraan Ditambahkan",
@@ -167,8 +173,38 @@ export default function AdminKendaraanPage() {
                     <SelectItem value="BENSIN">Bensin</SelectItem>
                     <SelectItem value="DIESEL">Diesel</SelectItem>
                     <SelectItem value="HYBRID">Hybrid</SelectItem>
+                    <SelectItem value="ELECTRIC">Listrik</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Kapasitas Mesin</Label>
+                <Input
+                  value={newCar.engineCapacity || ""}
+                  onChange={(e) => setNewCar({...newCar, engineCapacity: e.target.value})}
+                  placeholder="Contoh: 1500cc"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Status Pajak</Label>
+                <Select value={newCar.taxStatus || ""} onValueChange={(value) => setNewCar({...newCar, taxStatus: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status pajak" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Hidup">Hidup</SelectItem>
+                    <SelectItem value="Mati">Mati</SelectItem>
+                    <SelectItem value="Off The Road">Off The Road</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Tanggal Pajak Berakhir</Label>
+                <Input
+                  type="date"
+                  value={newCar.taxExpiry || ""}
+                  onChange={(e) => setNewCar({...newCar, taxExpiry: e.target.value})}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Odometer (KM)</Label>

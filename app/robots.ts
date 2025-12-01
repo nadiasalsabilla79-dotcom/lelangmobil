@@ -21,10 +21,12 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/',
           '/dashboard/',
           '/api/',
+          '/_next/',
           '/private/',
         ],
-      }
+      },
     ],
     sitemap: 'https://lelangmobil.com/sitemap.xml',
+    host: 'https://lelangmobil.com',
   }
 }
