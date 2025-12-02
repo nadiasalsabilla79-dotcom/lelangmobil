@@ -23,7 +23,14 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       setWallet: (wallet) => set({ wallet }),
       setKyc: (kyc) => set({ kyc }),
-      logout: () => set({ user: null, wallet: null, kyc: null, isAuthenticated: false }),
+      logout: () => {
+        // Clear cookies
+        if (typeof document !== 'undefined') {
+          document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+          document.cookie = 'user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+        }
+        set({ user: null, wallet: null, kyc: null, isAuthenticated: false })
+      },
     }),
     { name: "auth-storage" },
   ),

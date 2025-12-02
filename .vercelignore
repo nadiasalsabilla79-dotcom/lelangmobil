@@ -1,34 +1,14 @@
-# Dependencies
-node_modules/
-
-# Build outputs
-.next/
-out/
-
-# Environment files
-.env
+node_modules
+.next
 .env.local
-.env.*.local
-
-# Logs
+.env
 *.log
-
-# Database
-*.db
-*.sqlite
-
-# IDE
-.vscode/
-.idea/
-
-# OS
 .DS_Store
 Thumbs.db
-
-# Custom
+*.md
+*.txt
 *.bat
-*.sh
+scripts/
+node-portable/
 .qodo/
 .amazonq/
-rz.zip
-New folder (15).zip

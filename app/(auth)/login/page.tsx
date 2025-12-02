@@ -51,21 +51,28 @@ export default function LoginPage() {
       const wallet = dummyWallets.find((w) => w.userId === user.id)
       const kyc = dummyKYC.find((k) => k.userId === user.id)
 
+      // Set auth data
       setUser(user)
       if (wallet) setWallet(wallet)
       if (kyc) setKyc(kyc)
+
+      // Set cookies for middleware
+      document.cookie = `auth-token=dummy-token-${user.id}; path=/; max-age=604800`
+      document.cookie = `user-role=${user.role}; path=/; max-age=604800`
 
       toast({
         title: "Login Berhasil",
         description: `Selamat datang kembali, ${user.name}!`,
       })
 
-      // Redirect based on role
-      if (user.role === "ADMIN") {
-        router.push("/admin")
-      } else {
-        router.push("/dashboard")
-      }
+      // Small delay to ensure state is set
+      setTimeout(() => {
+        if (user.role === "ADMIN") {
+          router.push("/admin")
+        } else {
+          router.push("/dashboard")
+        }
+      }, 100)
     } else {
       toast({
         title: "Login Gagal",

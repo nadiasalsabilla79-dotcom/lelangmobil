@@ -7,7 +7,7 @@ const bankPartners = [
   {
     name: "Bank Central Asia",
     code: "BCA",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/200px-Bank_Central_Asia.svg.png",
+    logo: "/banks/bca-logo.png",
     accountNumber: "1234567890",
     accountName: "PT LelangMobil Indonesia",
     features: ["Transfer Real-time", "Mobile Banking", "Internet Banking"]
@@ -15,7 +15,7 @@ const bankPartners = [
   {
     name: "Bank Mandiri",
     code: "MANDIRI", 
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/200px-Bank_Mandiri_logo_2016.svg.png",
+    logo: "/banks/mandiri-logo.png",
     accountNumber: "0987654321",
     accountName: "PT LelangMobil Indonesia",
     features: ["Livin' by Mandiri", "ATM Terluas", "Transfer Instan"]
@@ -23,7 +23,7 @@ const bankPartners = [
   {
     name: "Bank Rakyat Indonesia",
     code: "BRI",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/BRI_2020.svg/200px-BRI_2020.svg.png", 
+    logo: "/banks/bri-logo.png", 
     accountNumber: "1122334455",
     accountName: "PT LelangMobil Indonesia",
     features: ["BRImo", "Jaringan Terluas", "Transfer 24/7"]
@@ -31,7 +31,7 @@ const bankPartners = [
   {
     name: "Bank Negara Indonesia",
     code: "BNI",
-    logo: "https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/200px-BNI_logo.svg.png",
+    logo: "/banks/bni-logo.png",
     accountNumber: "5544332211", 
     accountName: "PT LelangMobil Indonesia",
     features: ["BNI Mobile", "Taplus", "Transfer Cepat"]
