@@ -1,14 +1,10 @@
 node_modules
-.next
 .env.local
-.env
 *.log
 .DS_Store
 Thumbs.db
-*.md
-*.txt
-*.bat
-scripts/
 node-portable/
 .qodo/
 .amazonq/
+Git-installer.exe
+*.zip
