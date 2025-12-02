@@ -1,0 +1,24 @@
+========================================
+IMPORT ENVIRONMENT VARIABLES KE VERCEL
+========================================
+
+CARA TERCEPAT: Copy-Paste Langsung
+========================================
+
+1. Buka Vercel Dashboard: https://vercel.com/dashboard
+2. Pilih project: lelangmobil
+3. Klik: Settings → Environment Variables
+4. Klik: "Add New" atau "Import .env"
+5. Copy-paste semua baris di bawah ini:
+
+POSTGRES_PRISMA_URL=postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+POSTGRES_URL_NON_POOLING=postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require
+DATABASE_URL=postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+JWT_SECRET=lelangmobil-production-jwt-secret-key-2025-secure-random-string
+NEXT_PUBLIC_APP_NAME=LelangMobil
+NODE_ENV=production
+
+6. Klik "Save"
+7. Redeploy project
+
+SELESAI!

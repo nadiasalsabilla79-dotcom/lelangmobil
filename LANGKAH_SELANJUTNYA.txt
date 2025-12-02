@@ -1,0 +1,122 @@
+========================================
+LANGKAH SELANJUTNYA - SETUP LENGKAP
+========================================
+
+✅ SUDAH SELESAI:
+- Upload ke GitHub: https://github.com/nadiasalsabilla79-dotcom/lelangmobil
+- Middleware fix (tidak redirect loop)
+- Login cookie fix
+- Build configuration
+- Supabase database credentials
+
+❌ YANG HARUS DILAKUKAN:
+
+1. SETUP DATABASE DI SUPABASE
+   ========================================
+   a. Buka: https://supabase.com/dashboard/project/kmbjlprxfzbimwfrysht/sql
+   b. Copy semua isi file: SUPABASE_SETUP.sql
+   c. Paste di SQL Editor
+   d. Klik tombol "RUN" (atau Ctrl+Enter)
+   e. Tunggu hingga muncul pesan sukses
+   f. Verifikasi: Cek tab "Table Editor" - harus ada 8 tables
+
+2. SET ENVIRONMENT VARIABLES DI VERCEL
+   ========================================
+   a. Buka: https://vercel.com/dashboard
+   b. Pilih project: lelangmobil
+   c. Klik: Settings → Environment Variables
+   d. Tambahkan variable berikut (satu per satu):
+
+   Variable 1:
+   Name: POSTGRES_PRISMA_URL
+   Value: postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+
+   Variable 2:
+   Name: POSTGRES_URL_NON_POOLING
+   Value: postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require
+
+   Variable 3:
+   Name: DATABASE_URL
+   Value: postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+
+   Variable 4:
+   Name: JWT_SECRET
+   Value: lelangmobil-production-jwt-secret-key-2025-secure-random-string
+
+   Variable 5:
+   Name: NEXT_PUBLIC_APP_NAME
+   Value: LelangMobil
+
+   e. Klik "Save" untuk setiap variable
+
+3. REDEPLOY DI VERCEL
+   ========================================
+   a. Klik tab: Deployments
+   b. Klik tombol: "Redeploy" pada deployment terakhir
+   c. Pilih: "Use existing Build Cache" → UNCHECK (jangan centang)
+   d. Klik: "Redeploy"
+   e. Tunggu 2-3 menit hingga status: "Ready"
+
+4. TEST WEBSITE
+   ========================================
+   a. Buka URL deployment Vercel (contoh: https://lelangmobil.vercel.app)
+   b. Klik tombol "Login"
+   c. Login dengan:
+      Email: admin@lelangmobil.com
+      Password: password123
+   d. Jika berhasil masuk ke dashboard = SUKSES! 🎉
+
+5. TEST USER BIASA
+   ========================================
+   a. Logout dari admin
+   b. Login dengan:
+      Email: budi@gmail.com
+      Password: password123
+   c. Cek saldo wallet: Rp 25.000.000
+   d. Cek halaman lelang: Ada 3 mobil
+
+========================================
+TROUBLESHOOTING
+========================================
+
+MASALAH: Build Failed di Vercel
+SOLUSI: 
+- Cek Build Logs di tab Deployments
+- Pastikan semua environment variables sudah di-set
+- Pastikan database Supabase sudah di-setup
+
+MASALAH: Login redirect ke login terus
+SOLUSI:
+- Clear browser cookies
+- Coba browser incognito/private
+- Pastikan middleware.ts sudah ter-update
+
+MASALAH: Database connection error
+SOLUSI:
+- Cek environment variables di Vercel
+- Pastikan POSTGRES_PRISMA_URL benar
+- Cek Supabase dashboard apakah database aktif
+
+========================================
+AKUN DEMO
+========================================
+
+Admin:
+Email: admin@lelangmobil.com
+Password: password123
+
+User:
+Email: budi@gmail.com
+Password: password123
+Saldo: Rp 25.000.000
+
+========================================
+SELESAI!
+========================================
+
+Jika semua langkah sudah dilakukan, website sudah 100% production ready!
+
+Repository: https://github.com/nadiasalsabilla79-dotcom/lelangmobil
+Vercel: https://vercel.com/dashboard
+
+Support: Jika ada masalah, cek file README.md untuk dokumentasi lengkap.
