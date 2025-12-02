@@ -14,13 +14,22 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Find user
+    // Find user with wallet
     const user = await prisma.user.findUnique({
       where: { email },
       include: {
         wallet: true
       }
     })
+    
+    // Get KYC data if exists
+    const kycData = user ? {
+      userId: user.id,
+      status: user.kycStatus,
+      ktpUrl: user.kycKtpUrl,
+      selfieUrl: user.kycSelfieUrl,
+      rejectedReason: user.kycRejectedReason,
+    } : null
     
     if (!user) {
       return NextResponse.json(
@@ -58,12 +67,14 @@ export async function POST(request: NextRequest) {
       { expiresIn: '7d' }
     )
     
-    // Remove password from response
-    const { password: _, emailVerifyToken, passwordResetToken, ...userWithoutSensitive } = user
+    // Remove password and sensitive data from response
+    const { password: _, emailVerifyToken, passwordResetToken, wallet, kycKtpUrl, kycSelfieUrl, kycRejectedReason, ...userWithoutSensitive } = user
     
     return NextResponse.json({
       success: true,
       user: userWithoutSensitive,
+      wallet: user.wallet,
+      kyc: kycData,
       token,
       message: 'Login successful'
     })

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // Generate verification token
     const verificationToken = randomBytes(32).toString('hex')
     
-    // Create user
+    // Create user (emailVerified true for demo)
     const user = await prisma.user.create({
       data: {
         email,
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         name,
         phone,
         emailVerifyToken: verificationToken,
-        emailVerified: false,
+        emailVerified: true, // Auto-verify for demo
       }
     })
     
@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
       }
     })
     
-    // Send verification email
-    await sendVerificationEmail(email, verificationToken)
+    // Send verification email (skipped for demo)
+    // await sendVerificationEmail(email, verificationToken)
     
     return NextResponse.json({
       success: true,
