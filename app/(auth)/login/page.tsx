@@ -30,58 +30,56 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
 
-    // Demo login - check against dummy data
-    const user = dummyUsers.find((u) => u.email === email)
+      const data = await res.json()
 
-    if (user && password === "password123") {
-      // Check email verification for non-admin users
-      if (user.role === "USER" && !user.emailVerified) {
-        toast({
-          title: "Email Belum Diverifikasi",
-          description: "Silakan verifikasi email Anda terlebih dahulu",
-          variant: "destructive",
-        })
-        setIsLoading(false)
-        return
+      if (!res.ok) {
+        throw new Error(data.error || 'Login gagal')
       }
 
-      const wallet = dummyWallets.find((w) => w.userId === user.id)
-      const kyc = dummyKYC.find((k) => k.userId === user.id)
-
       // Set auth data
-      setUser(user)
-      if (wallet) setWallet(wallet)
-      if (kyc) setKyc(kyc)
+      setUser(data.user)
+      if (data.wallet) setWallet(data.wallet)
+      if (data.kyc) setKyc(data.kyc)
 
       // Set cookies for middleware
-      const authData = JSON.stringify({ state: { isAuthenticated: true, user, wallet, kyc } })
+      const authData = JSON.stringify({ 
+        state: { 
+          isAuthenticated: true, 
+          user: data.user, 
+          wallet: data.wallet, 
+          kyc: data.kyc 
+        } 
+      })
       document.cookie = `auth-storage=${encodeURIComponent(authData)}; path=/; max-age=604800`
 
       toast({
         title: "Login Berhasil",
-        description: `Selamat datang kembali, ${user.name}!`,
+        description: `Selamat datang kembali, ${data.user.name}!`,
       })
 
-      // Small delay to ensure state is set
       setTimeout(() => {
-        if (user.role === "ADMIN") {
+        if (data.user.role === "ADMIN") {
           router.push("/admin")
         } else {
           router.push("/dashboard")
         }
       }, 100)
-    } else {
+    } catch (error: any) {
       toast({
         title: "Login Gagal",
-        description: "Email atau password salah. Silakan periksa kembali kredensial Anda.",
+        description: error.message,
         variant: "destructive",
       })
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   return (

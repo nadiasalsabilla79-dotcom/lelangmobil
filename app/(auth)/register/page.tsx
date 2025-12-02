@@ -59,40 +59,39 @@ export default function RegisterPage() {
 
     setIsLoading(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+        }),
+      })
 
-    // Create new user (demo)
-    const newUser = {
-      id: `user-${Date.now()}`,
-      email: formData.email,
-      phone: formData.phone,
-      name: formData.name,
-      role: "USER" as const,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Pendaftaran gagal')
+      }
+
+      toast({
+        title: "Pendaftaran Berhasil!",
+        description: "Silakan login dengan akun Anda",
+      })
+
+      router.push('/login')
+    } catch (error: any) {
+      toast({
+        title: "Pendaftaran Gagal",
+        description: error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
-
-    const newWallet = {
-      id: `wallet-${Date.now()}`,
-      userId: newUser.id,
-      balance: 0, // Bonus akan diberikan SETELAH KYC disetujui admin
-      holdBalance: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-
-    setUser(newUser)
-    setWallet(newWallet)
-    setKyc(null)
-
-    toast({
-      title: "Pendaftaran Berhasil!",
-      description: "Silakan lengkapi verifikasi KYC untuk mendapatkan bonus Rp 1.000.000",
-    })
-
-    router.push("/dashboard/kyc")
-    setIsLoading(false)
   }
 
   return (
