@@ -15,29 +15,15 @@ export function middleware(request: NextRequest) {
     return response
   }
 
-  // Public routes
-  const publicRoutes = [
-    '/',
-    '/login',
-    '/register',
-    '/lelang',
-    '/cara-kerja',
-    '/tentang',
-    '/kontak',
-    '/verify-email',
-    '/forgot-password',
-    '/reset-password'
-  ]
-  
-  const isPublicRoute = publicRoutes.some(
-    (route) => pathname === route || pathname.startsWith('/lelang/')
-  )
+  // Protected routes only
+  const protectedRoutes = ['/dashboard', '/admin']
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
 
-  if (isPublicRoute) {
+  if (!isProtectedRoute) {
     return response
   }
 
-  // Check authentication for protected routes
+  // Check authentication
   const authStorage = request.cookies.get('auth-storage')?.value
   let isAuthenticated = false
   
@@ -46,12 +32,12 @@ export function middleware(request: NextRequest) {
       const parsed = JSON.parse(authStorage)
       isAuthenticated = parsed.state?.isAuthenticated || false
     } catch {
-      // Invalid storage, continue as unauthenticated
+      // Invalid storage
     }
   }
 
   // Redirect to login if not authenticated
-  if (!isAuthenticated && (pathname.startsWith('/dashboard') || pathname.startsWith('/admin'))) {
+  if (!isAuthenticated) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
