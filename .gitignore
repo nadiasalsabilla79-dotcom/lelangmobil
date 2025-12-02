@@ -44,10 +44,10 @@ Thumbs.db
 # Custom
 /node-portable/
 *.zip
-*.bat
-*.sh
 .qodo/
 .amazonq/
+Git-installer.exe
+*.zip
 
 # Logs
 logs
