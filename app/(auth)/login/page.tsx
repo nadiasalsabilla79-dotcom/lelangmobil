@@ -57,8 +57,8 @@ export default function LoginPage() {
       if (kyc) setKyc(kyc)
 
       // Set cookies for middleware
-      document.cookie = `auth-token=dummy-token-${user.id}; path=/; max-age=604800`
-      document.cookie = `user-role=${user.role}; path=/; max-age=604800`
+      const authData = JSON.stringify({ state: { isAuthenticated: true, user, wallet, kyc } })
+      document.cookie = `auth-storage=${encodeURIComponent(authData)}; path=/; max-age=604800`
 
       toast({
         title: "Login Berhasil",
