@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Inter, Plus_Jakarta_Sans, Playfair_Display } from "next/font/google"
-import "./globals.css"
+import "./global.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 
