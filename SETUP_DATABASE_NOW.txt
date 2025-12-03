@@ -1,0 +1,191 @@
+========================================
+SETUP DATABASE SUPABASE - WAJIB!
+========================================
+
+ERROR: "Internal server error" = Database belum ada data!
+
+LANGKAH WAJIB:
+========================================
+
+1. Buka Supabase SQL Editor:
+   https://supabase.com/dashboard/project/kmbjlprxfzbimwfrysht/sql
+
+2. Copy SEMUA kode SQL di bawah ini:
+
+========================================
+SQL CODE - COPY SEMUA
+========================================
+
+-- Create Enums
+CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
+CREATE TYPE "KYCStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+CREATE TYPE "TransactionType" AS ENUM ('DEPOSIT', 'WITHDRAW', 'BID_HOLD', 'BID_RELEASE', 'BID_WIN', 'BONUS');
+CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'COMPLETED');
+CREATE TYPE "AuctionStatus" AS ENUM ('DRAFT', 'UPCOMING', 'LIVE', 'ENDED');
+CREATE TYPE "NotificationType" AS ENUM ('KYC', 'TRANSACTION', 'BID', 'AUCTION', 'SYSTEM');
+
+-- Create User Table
+CREATE TABLE "User" (
+    id TEXT PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    name TEXT NOT NULL,
+    phone TEXT,
+    role "Role" DEFAULT 'USER' NOT NULL,
+    "emailVerified" BOOLEAN DEFAULT false NOT NULL,
+    "emailVerifyToken" TEXT,
+    "passwordResetToken" TEXT,
+    "passwordResetExpires" TIMESTAMP(3),
+    "kycStatus" "KYCStatus" DEFAULT 'PENDING' NOT NULL,
+    "kycKtpUrl" TEXT,
+    "kycSelfieUrl" TEXT,
+    "kycRejectedReason" TEXT,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL
+);
+
+-- Create Wallet Table
+CREATE TABLE "Wallet" (
+    id TEXT PRIMARY KEY,
+    "userId" TEXT UNIQUE NOT NULL,
+    balance DECIMAL(15,2) DEFAULT 0 NOT NULL,
+    "holdBalance" DECIMAL(15,2) DEFAULT 0 NOT NULL,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE
+);
+
+-- Create Transaction Table
+CREATE TABLE "Transaction" (
+    id TEXT PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    type "TransactionType" NOT NULL,
+    amount DECIMAL(15,2) NOT NULL,
+    status "TransactionStatus" DEFAULT 'PENDING' NOT NULL,
+    "bankName" TEXT,
+    "accountNumber" TEXT,
+    "accountName" TEXT,
+    "proofUrl" TEXT,
+    notes TEXT,
+    "adminNotes" TEXT,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE
+);
+
+-- Create Car Table
+CREATE TABLE "Car" (
+    id TEXT PRIMARY KEY,
+    brand TEXT NOT NULL,
+    model TEXT NOT NULL,
+    year INTEGER NOT NULL,
+    color TEXT NOT NULL,
+    transmission TEXT NOT NULL,
+    "fuelType" TEXT NOT NULL,
+    odometer INTEGER NOT NULL,
+    location TEXT NOT NULL,
+    grade TEXT NOT NULL,
+    description TEXT NOT NULL,
+    images JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL
+);
+
+-- Create Auction Table
+CREATE TABLE "Auction" (
+    id TEXT PRIMARY KEY,
+    "carId" TEXT NOT NULL,
+    title TEXT NOT NULL,
+    "startPrice" DECIMAL(15,2) NOT NULL,
+    "currentPrice" DECIMAL(15,2) NOT NULL,
+    "minIncrement" DECIMAL(15,2) NOT NULL,
+    "startTime" TIMESTAMP(3) NOT NULL,
+    "endTime" TIMESTAMP(3) NOT NULL,
+    status "AuctionStatus" DEFAULT 'DRAFT' NOT NULL,
+    "winnerId" TEXT,
+    "totalBids" INTEGER DEFAULT 0 NOT NULL,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    FOREIGN KEY ("carId") REFERENCES "Car"(id) ON DELETE CASCADE
+);
+
+-- Create Bid Table
+CREATE TABLE "Bid" (
+    id TEXT PRIMARY KEY,
+    "auctionId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    amount DECIMAL(15,2) NOT NULL,
+    "isWinning" BOOLEAN DEFAULT false NOT NULL,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY ("auctionId") REFERENCES "Auction"(id) ON DELETE CASCADE,
+    FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE
+);
+
+-- Create Notification Table
+CREATE TABLE "Notification" (
+    id TEXT PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    type "NotificationType" NOT NULL,
+    "isRead" BOOLEAN DEFAULT false NOT NULL,
+    link TEXT,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE
+);
+
+-- Create Indexes
+CREATE INDEX "User_email_idx" ON "User"(email);
+CREATE INDEX "Transaction_userId_idx" ON "Transaction"("userId");
+CREATE INDEX "Transaction_status_idx" ON "Transaction"(status);
+CREATE INDEX "Car_brand_idx" ON "Car"(brand);
+CREATE INDEX "Car_location_idx" ON "Car"(location);
+CREATE INDEX "Auction_status_idx" ON "Auction"(status);
+CREATE INDEX "Auction_startTime_idx" ON "Auction"("startTime");
+CREATE INDEX "Auction_endTime_idx" ON "Auction"("endTime");
+CREATE INDEX "Bid_auctionId_idx" ON "Bid"("auctionId");
+CREATE INDEX "Bid_userId_idx" ON "Bid"("userId");
+CREATE INDEX "Bid_createdAt_idx" ON "Bid"("createdAt");
+CREATE INDEX "Notification_userId_idx" ON "Notification"("userId");
+CREATE INDEX "Notification_isRead_idx" ON "Notification"("isRead");
+
+-- Insert Admin User (password: password123)
+INSERT INTO "User" (id, email, password, name, role, "emailVerified", "kycStatus", "createdAt", "updatedAt")
+VALUES ('admin-001', 'admin@lelangmobil.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIq8YdVZTy', 'Admin LelangMobil', 'ADMIN', true, 'APPROVED', NOW(), NOW());
+
+-- Insert Demo User (password: password123)
+INSERT INTO "User" (id, email, password, name, phone, role, "emailVerified", "kycStatus", "createdAt", "updatedAt")
+VALUES ('user-001', 'budi@gmail.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIq8YdVZTy', 'Budi Santoso', '081234567890', 'USER', true, 'APPROVED', NOW(), NOW());
+
+-- Insert Wallet
+INSERT INTO "Wallet" (id, "userId", balance, "holdBalance", "createdAt", "updatedAt")
+VALUES ('wallet-001', 'user-001', 25000000, 0, NOW(), NOW());
+
+-- Insert Cars
+INSERT INTO "Car" (id, brand, model, year, color, transmission, "fuelType", odometer, location, grade, description, images, "createdAt", "updatedAt")
+VALUES 
+('car-001', 'Toyota', 'Avanza', 2020, 'Silver', 'Manual', 'Bensin', 45000, 'Jakarta', 'A', 'Toyota Avanza 2020 kondisi istimewa', '["https://images.unsplash.com/photo-1619767886558-efdc259cde1a"]', NOW(), NOW()),
+('car-002', 'Honda', 'Civic', 2019, 'Hitam', 'Automatic', 'Bensin', 35000, 'Surabaya', 'A', 'Honda Civic 2019 terawat', '["https://images.unsplash.com/photo-1590362891991-f776e747a588"]', NOW(), NOW()),
+('car-003', 'Mitsubishi', 'Pajero Sport', 2021, 'Putih', 'Automatic', 'Diesel', 25000, 'Bandung', 'A', 'Pajero Sport 2021 mulus', '["https://images.unsplash.com/photo-1533473359331-0135ef1b58bf"]', NOW(), NOW());
+
+-- Insert Auctions
+INSERT INTO "Auction" (id, "carId", title, "startPrice", "currentPrice", "minIncrement", "startTime", "endTime", status, "totalBids", "createdAt", "updatedAt")
+VALUES 
+('auction-001', 'car-001', 'Toyota Avanza 2020 - Silver', 150000000, 150000000, 1000000, NOW() + INTERVAL '1 hour', NOW() + INTERVAL '2 days', 'UPCOMING', 0, NOW(), NOW()),
+('auction-002', 'car-002', 'Honda Civic 2019 - Hitam', 250000000, 250000000, 2000000, NOW() + INTERVAL '2 hours', NOW() + INTERVAL '3 days', 'UPCOMING', 0, NOW(), NOW()),
+('auction-003', 'car-003', 'Mitsubishi Pajero Sport 2021', 400000000, 400000000, 5000000, NOW() + INTERVAL '3 hours', NOW() + INTERVAL '4 days', 'UPCOMING', 0, NOW(), NOW());
+
+========================================
+END SQL CODE
+========================================
+
+3. Paste di SQL Editor Supabase
+4. Klik tombol "RUN" atau tekan Ctrl+Enter
+5. Tunggu hingga selesai (akan muncul pesan sukses)
+
+SETELAH ITU:
+- Refresh halaman login
+- Login dengan: admin@lelangmobil.com / password123
+- BERHASIL!
+
+========================================
