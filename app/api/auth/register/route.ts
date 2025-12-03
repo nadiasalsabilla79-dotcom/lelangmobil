@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma } from '@/lib/prisma'
 import { sendVerificationEmail } from '@/lib/email'
 import bcrypt from 'bcryptjs'
 import { randomBytes } from 'crypto'
