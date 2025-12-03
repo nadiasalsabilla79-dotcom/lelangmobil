@@ -1,0 +1,58 @@
+========================================
+COPY-PASTE INI KE VERCEL
+========================================
+
+LANGKAH 1: Buka link ini
+https://vercel.com/nadiasalsabilla79-dotcom/lelangmobil/settings/environment-variables
+
+LANGKAH 2: Klik "Add New" atau "Bulk Edit"
+
+LANGKAH 3: Copy SEMUA text di bawah ini (dari POSTGRES sampai NEXT_PUBLIC)
+
+========================================
+COPY DARI SINI ↓
+========================================
+
+POSTGRES_PRISMA_URL=postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+
+DATABASE_URL=postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+
+JWT_SECRET=lelangmobil-production-jwt-secret-key-2025-secure-random-string
+
+NEXT_PUBLIC_APP_NAME=LelangMobil
+
+========================================
+SAMPAI SINI ↑
+========================================
+
+LANGKAH 4: Paste di Vercel
+
+LANGKAH 5: Pilih Environment: Production, Preview, Development (CENTANG SEMUA)
+
+LANGKAH 6: Klik "Save"
+
+LANGKAH 7: Klik tab "Deployments"
+
+LANGKAH 8: Klik "Redeploy" (UNCHECK "Use existing Build Cache")
+
+LANGKAH 9: Tunggu 2-3 menit
+
+LANGKAH 10: Buka website Anda dan login dengan:
+Email: admin@lelangmobil.com
+Password: password123
+
+SELESAI! LOGIN BERHASIL! 🎉
+
+========================================
+KENAPA HARUS INI?
+========================================
+
+Tanpa ENV variables, aplikasi tidak bisa:
+- Connect ke database Supabase
+- Query data user
+- Verify password
+- Generate JWT token
+
+Ini SATU-SATUNYA cara agar login berhasil!
+
+========================================
