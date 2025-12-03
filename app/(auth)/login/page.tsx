@@ -13,8 +13,6 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuthStore } from "@/lib/store"
-import { dummyUsers, dummyWallets, dummyKYC } from "@/lib/dummy-data"
-import { LightweightBackground } from "@/components/ui/lightweight-background"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -31,6 +29,8 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
+      console.log('Attempting login for:', email)
+      
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -38,9 +38,10 @@ export default function LoginPage() {
       })
 
       const data = await res.json()
+      console.log('Login response:', { status: res.status, data })
 
       if (!res.ok) {
-        throw new Error(data.error || 'Login gagal')
+        throw new Error(data.error || `Login gagal (${res.status})`)
       }
 
       // Set auth data
@@ -72,9 +73,10 @@ export default function LoginPage() {
         }
       }, 100)
     } catch (error: any) {
+      console.error('Login error:', error)
       toast({
         title: "Login Gagal",
-        description: error.message,
+        description: error.message || 'Terjadi kesalahan. Silakan coba lagi.',
         variant: "destructive",
       })
     } finally {
@@ -104,6 +106,13 @@ export default function LoginPage() {
             <Image src="/logo-lelangmobil.svg" alt="LelangMobil" width={48} height={48} className="rounded-xl shadow-lg" />
             <span className="font-serif text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">LelangMobil</span>
           </Link>
+        </div>
+
+        {/* Demo Account Info */}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+          <p className="font-semibold text-blue-900 mb-1">Akun Demo:</p>
+          <p className="text-blue-700">Email: admin@lelangmobil.com</p>
+          <p className="text-blue-700">Password: password123</p>
         </div>
 
         <Card className="bg-white border shadow-xl rounded-2xl">
