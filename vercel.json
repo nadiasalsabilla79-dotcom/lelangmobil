@@ -1,8 +1,3 @@
 {
-  "env": {
-    "POSTGRES_PRISMA_URL": "postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true",
-    "DATABASE_URL": "postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true",
-    "JWT_SECRET": "lelangmobil-production-jwt-secret-key-2025-secure-random-string",
-    "NEXT_PUBLIC_APP_NAME": "LelangMobil"
-  }
+  "framework": "nextjs"
 }

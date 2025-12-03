@@ -1,0 +1,52 @@
+========================================
+CRITICAL: ENV VARIABLES BELUM DI-SET!
+========================================
+
+ERROR: "Internal server error" = ENV variables di Vercel BELUM DI-SET!
+
+Vercel.json TIDAK BISA auto-set ENV variables!
+Anda HARUS set manual di dashboard!
+
+========================================
+SOLUSI TERCEPAT (30 DETIK):
+========================================
+
+1. Buka link ini SEKARANG:
+   https://vercel.com/nadiasalsabilla79-dotcom/lelangmobil/settings/environment-variables
+
+2. Klik tombol "Add New" atau "Bulk Edit"
+
+3. Copy-paste SEMUA ini:
+
+POSTGRES_PRISMA_URL=postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+DATABASE_URL=postgres://postgres.kmbjlprxfzbimwfrysht:TOVrCNyeJe8CGwM3@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+JWT_SECRET=lelangmobil-production-jwt-secret-key-2025-secure-random-string
+NEXT_PUBLIC_APP_NAME=LelangMobil
+
+4. Pilih Environment: Production, Preview, Development (SEMUA)
+
+5. Klik "Save"
+
+6. Klik "Deployments" → "Redeploy" (UNCHECK cache)
+
+7. Tunggu 2 menit
+
+8. Login akan BERHASIL!
+
+========================================
+KENAPA HARUS MANUAL?
+========================================
+
+- Vercel.json TIDAK support auto-set ENV
+- Vercel API butuh token authentication
+- Saya tidak punya akses ke dashboard Anda
+- ENV variables WAJIB di-set di dashboard
+
+========================================
+TANPA SET ENV = LOGIN GAGAL TERUS!
+========================================
+
+Aplikasi tidak bisa connect ke database tanpa ENV!
+Ini SATU-SATUNYA cara agar login berhasil!
+
+LAKUKAN SEKARANG: 30 detik saja!
